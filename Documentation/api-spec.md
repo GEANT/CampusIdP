@@ -1,3 +1,8 @@
+***DRAFT***
+
+***
+
+
 ## Goals
 
 1. Define a representation of information about IdP configuration retrieved by remote client
