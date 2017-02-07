@@ -16,7 +16,7 @@ Proposed format is json
     -  **@type** : The special keyname is used to set the data type of a node or typed value within document
     -  **@id** : The special keyname defines unique identifier and can be also used for reference
 - In addition the root object must contain:
-     - **configs** : This keyame will contains all IdP configuration elements in array
+     - **configs** : This keyame will contain a collection (array) of configuration elements like attribute definitions
     
 
 
@@ -28,7 +28,8 @@ The root object is @type of **IdPConf** and doesn't contain "@id"
     "@type": "IdPConf",
     "configs": [
     
-    ]
+    ],
+    "apiVersion" : "1"
 }
 ```
 
@@ -46,15 +47,138 @@ Objects inside "configs" array without one of the following key-value pairs will
 - "action": "update"
 
 ### Types of configs objects
+- ServiceDescriptor
+- MetadataProvider
+- DataSource
+- Certificate
+- AttributeDefinition
+- DataConnector
+
+
+#### Global 
+
+##### ***"~~@type" : "Connector"~~***
+
+
+**"@type": "ServiceDescription"**
+```json
+{
+     "@id": "ServiceConfiguration",
+     "@type": "ServiceDescription",
+     "entityID": "https://idp.example.com/idp",
+}
+```
+
+
+**"@type": "DataSource"**
+
+```json
+{
+     "@id": "ldap01",
+     "@type": "DataSource",
+     "confType": "LDAPDirectory",
+     "ldapURL": "ldap:\/\/localhost:389",
+     "baseDN": "DC=example,DC=com",
+     "bindDN": "cn=connector,dc=example,dc=com",
+     "bindDNCredentials": "123"
+}
+
+```
+
+**"@type": "DataConnector"**
+
+Keynames used to build "DataConnector" node:
+
+* **@id**  *[required] *: DataConnector ID is used for reference within document and for attribute release policy 
+* **@type** *[required] *: defines the type of a node. In this case is "DataConnector"
+* **confType**  *[required] *: defines the type of DataConnector. Convetion is taken from ShibbolethIdP *(ad:Type)*
+		* LDAPDirectory
+		* Static
+		* ScriptedDataConnector
+		* RelationalDatabase
+* **confRef** *[optional] *: defines the source of configuration data. If set then the value must be existing @id
+* **scriptData**: used by *ScriptedDataConnector*
+
+
+example for static attributes
+
+```json
+{
+    "@id": "StaticAttributes",
+    "@type": "DataConnector",
+    "confType": "Static",
+    "attributes": [
+        {
+            "attrid": "ou",
+            "values": [
+                "Organization name"
+            ]
+        },
+        {
+            "attrid": "eduPersonEntitlement",
+            "values": [
+                "urn:mace:terena.org:tcs:escience-admin",
+                "urn:mace:terena.org:tcs:escience-user"
+            ]
+        }
+    ]
+}
+
+```
+example for DataConnector (LDAP)
+```json
+{
+     "@id": "myLdap",
+     "@type": "DataConnector",
+     "confType": "LDAPDirectory",
+     "confRef": "ldap01"
+}
+```
+
+
+**"@type": "MetadataProvider"**
+
+
+**"@type": "Certificate"**
+
+
 
 #### Attribute Resolver
 
-There are two types of special object: AttributeDefinition and DataConnector
+There are two types of nodes: **AttributeDefinition** and **DataConnector**
 
 ***
 
-##### ***"@type" : "AttributeDefinition"***
-example for defining email attribute:
+##### 
+**"@type" : "AttributeDefinition"**
+
+
+Keynames used to build "AttributeDefinition" object:
+
+* **@id**  *[required] *: attribute ID is used for reference within document and for attribute release policy 
+* **@type** *[required] *: defines the type of a node. In this case is "AttributeDefinition"
+* **confType**  *[required] *: defines the type of attributeDefiintion. Convetion is taken from ShibbolethIdP *(ad:Type)*
+		* Simple
+		* Template
+		* Scoped
+		* Scripted        
+* **sourceAttributeId** : required by *Simple*,  *Scoped*, *Prescoped*: 
+* **scope**: required by *Scoped*
+* **sourceAttribute**: array of attributes; required by *Template*
+* **generatedOutput**: required by *Template*
+* **dependency**: list (in array) of references to nodes of @type AttributeDefinition or DataConnector
+* **encodigns**:  array of  nodes having properties:
+		* name
+		* friendlyName
+		* encType
+* **scriptFile**: used by *Scripted*
+* **scriptData**: used by *Scripted*
+* **exposed** *[optional]*: *boolean value* defines if defined attribute may be considered to release. default is ***false***
+
+##### ***Examples***
+
+
+sample node of email attribute definition (conftype: Simple):
 ```json
 {
     "@id": "email",
@@ -66,7 +190,7 @@ example for defining email attribute:
            "@type": "@id"
        }
     ],
-    "sourceAttrId": "mail",
+    "sourceAttrIbuteId": "mail",
     "exposed": true,
     "encodings": [
         {
@@ -81,54 +205,3 @@ example for defining email attribute:
     ]
 }
 ```
-example final document containing only one attribute definition
-
-```json
-
- {
-    "@type": "IdPConf",
-    "configs": [
-        [
-            {
-                "@id": "email",
-                "@type": "AttributeDefinition",
-                "confType": "Simple",
-                "dependency": [
-                    {
-                        "@id": "myLdap",
-                        "@type": "@id"
-                    }
-                ],
-                "sourceAttrId": "mail",
-                "exposed": true,
-                "encodings": [
-                    {
-                        "encType": "SAML1String",
-                        "name": "urn:mace:dir:attribute-def:mail"
-                    },
-                    {
-                        "encType": "SAML2String",
-                        "name": "urn:oid:0.9.2342.19200300.100.1.3",
-                        "friendlyName": "mail"
-                    }
-                ]
-            }
-        ]
-    ]
-}
-```
-
-Keynames used to build "AttributeDefinition" object:
-- **@id**  *[required] *: attribute ID is used for reference within document and for attribute release policy 
-- **@type** *[required] *: defines the type of an object. In this case is "AttributeDefinition"
-- **confType**  *[required] *: defines the type of attributeDefiintion. Convetion is taken from ShibbolethIdP *(ad:Type)*
-- **sourceAttrId** *[TBC]*: 
-- **exposed** *[optional]*: *boolean value* defines if defined attribute may be considered to release. default is ***false***
-
-
-
-***
-
-**"@type": "DataConnector"**
-
-To be continue....
