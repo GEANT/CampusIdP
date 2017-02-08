@@ -61,11 +61,41 @@ Objects inside "configs" array without one of the following key-value pairs will
 
 
 **"@type": "ServiceDescription"**
+Used to set global information for IdP
+
+List of properties:
+
+* entityID :
+* idpsso : object with properties:
+	* scope
+	* certificates - list of nodes
+		* use : *signing/encryption*
+		* ref : *reference to cert id*
+* aa :
+	* scope
+	* certificates - list of nodes
+		* use : *signing/encryption*
+		* ref : *reference to cert id*
+
+
 ```json
 {
      "@id": "ServiceConfiguration",
      "@type": "ServiceDescription",
      "entityID": "https://idp.example.com/idp",
+     "idpsso": {
+         "certificates" : [
+             {
+                 "use": "signing",
+                 "ref": "cert01"
+             },
+             {
+                 "use": "encryption",
+                 "ref": "cert02"
+             }
+         ]
+     }
+     
 }
 ```
 
@@ -77,7 +107,7 @@ Objects inside "configs" array without one of the following key-value pairs will
      "@id": "ldap01",
      "@type": "DataSource",
      "confType": "LDAPDirectory",
-     "ldapURL": "ldap:\/\/localhost:389",
+     "ldapURL": "ldap://localhost:389",
      "baseDN": "DC=example,DC=com",
      "bindDN": "cn=connector,dc=example,dc=com",
      "bindDNCredentials": "123"
@@ -138,10 +168,22 @@ example for DataConnector (LDAP)
 
 **"@type": "MetadataProvider"**
 
+* @id
+* @type
+* confType:	  default value
+	* *FileBackedHTTPMetadataProvider*
+* url
+* metadataFilter: list of properties
+	* requiredValidUntill
+	* signatureValidation: *list of properties*
+		* certificate : *referecence to id of Certificate node*
+		
 
 **"@type": "Certificate"**
 
-
+* @id
+* @type : Certificate
+TBD
 
 #### Attribute Resolver
 
