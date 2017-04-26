@@ -47,7 +47,7 @@ Objects inside "configs" array without one of the following key-value pairs will
 - "action": "update"
 
 ### Types of configs objects
-- ServiceDescriptor
+- ServiceDescription
 - MetadataProvider
 - DataSource
 - Certificate
