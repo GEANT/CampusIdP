@@ -9,8 +9,6 @@ RUN apt-get update && \
     apt-get -y --no-install-recommends install \
     wget \
     openjdk-8-jre-headless \
-    vim \
-    less \
     gnupg2 \
     dirmngr && \
     rm -rf /var/lib/apt/lists/*
