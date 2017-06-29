@@ -10,7 +10,8 @@ RUN apt-get update && \
     wget \
     openjdk-8-jre \
     vim \
-    less
+    less && \
+    rm -rf /var/lib/apt/lists/*
 
 # Jetty
 ENV JETTY_VERSION="9.3.20.v20170531"\
