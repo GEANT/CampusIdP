@@ -81,6 +81,9 @@ RUN wget -q -P /opt/src/ https://shibboleth.net/downloads/identity-provider/$SHI
 RUN apt-get -y purge wget && \
     apt-get -y autoremove
 
+# Clean source codes
+RUN rm -rf /opt/src
+
 EXPOSE 8080 8443
 
 #CMD ["/bin/bash"]
