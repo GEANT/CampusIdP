@@ -10,10 +10,13 @@ RUN apt-get update && \
     wget \
     openjdk-8-jre \
     vim \
-    less
+    less \
+    gnupg2 \
+    dirmngr
 
 # Jetty
-ENV JETTY_VERSION="9.3.20.v20170531"\
+ENV JETTY_VERSION="9.3.20.v20170531" \
+    JETTY_KEY="2D0E1FB8FE4B68B4" \
     PASSWORD_CERT_KEY="jo7ahrie6aecoog2Eeng" \
     PASSWORD_PKCS12="aiveibooch1Ohk9ahxi3" \
     PASSWORD_KEYSTORE="oe7taiXiopiex2jusei8"
@@ -29,7 +32,8 @@ RUN groupadd idp && \
                         http://central.maven.org/maven2/org/eclipse/jetty/jetty-distribution/$JETTY_VERSION/jetty-distribution-$JETTY_VERSION.tar.gz.asc \
                         http://central.maven.org/maven2/org/eclipse/jetty/jetty-distribution/$JETTY_VERSION/jetty-distribution-$JETTY_VERSION.tar.gz.asc.sha1 && \
     echo `cat /opt/src/jetty-distribution-$JETTY_VERSION.tar.gz.sha1` /opt/src/jetty-distribution-$JETTY_VERSION.tar.gz | sha1sum -c && \
-    # FIXME check GPG
+    gpg --recv-keys $JETTY_KEY && \
+    gpg --verify /opt/src/jetty-distribution-$JETTY_VERSION.tar.gz.asc && \
     tar -xzf /opt/src/jetty-distribution-$JETTY_VERSION.tar.gz -C /opt && \
     chown -R idp:idp /opt/jetty-distribution-$JETTY_VERSION && \
     ln -snf /opt/jetty-distribution-$JETTY_VERSION/bin/jetty.sh /etc/init.d/jetty && \
@@ -48,6 +52,7 @@ RUN groupadd idp && \
 
 # Shibboleth IdP
 ENV SHIBBOLETH_VERSION="3.3.1" \
+    SHIBBOLETH_KEY="07CEEB8B" \
     SHIBBOLETH_SCOPE="devnull.cesnet.cz" \
     SHIBBOLETH_ENTITYID="https://devnull.cesnet.cz/idp/shibboleth" \
     SHIBBOLETH_HOSTNAME="devnull.cesnet.cz" \
@@ -58,7 +63,8 @@ RUN wget -q -P /opt/src/ https://shibboleth.net/downloads/identity-provider/$SHI
                          https://shibboleth.net/downloads/identity-provider/$SHIBBOLETH_VERSION/shibboleth-identity-provider-$SHIBBOLETH_VERSION.tar.gz.asc \
                          https://shibboleth.net/downloads/identity-provider/$SHIBBOLETH_VERSION/shibboleth-identity-provider-$SHIBBOLETH_VERSION.tar.gz.sha256 && \
     cd /opt/src && sha256sum -c shibboleth-identity-provider-$SHIBBOLETH_VERSION.tar.gz.sha256 && \
-    # FIXME check GPG
+    gpg --recv-keys $SHIBBOLETH_KEY && \
+    gpg --verify /opt/src/shibboleth-identity-provider-$SHIBBOLETH_VERSION.tar.gz.asc && \
     tar -xzf /opt/src/shibboleth-identity-provider-$SHIBBOLETH_VERSION.tar.gz -C /opt && \
     echo idp.no.tidy=true>>/opt/idp.install.properties && \
     echo idp.scope=$SHIBBOLETH_SCOPE>>/opt/idp.merge.properties && \
