@@ -77,6 +77,10 @@ RUN wget -q -P /opt/src/ https://shibboleth.net/downloads/identity-provider/$SHI
         -Didp.keystore.password=$SHIBBOLETH_PASSWORD_KEYSTORE \
         -Didp.noprompt=true
 
+# Clean packages
+RUN apt-get -y purge wget && \
+    apt-get -y autoremove
+
 EXPOSE 8080 8443
 
 #CMD ["/bin/bash"]
