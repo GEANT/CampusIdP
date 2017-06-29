@@ -1,105 +1,109 @@
-# GEANT GN4.2 JRA3 Task 1 Campus IdP - Cloud IDP on Docker
-# Using CentOS base image
-# Version 0.0
+FROM debian:stretch
 
-# Pull the rhel image from the local repository
-FROM centos:latest
-USER root
+MAINTAINER Jan Oppolzer <jan.oppolzer@cesnet.cz>
 
-MAINTAINER mario.reale@garr.it
+ENV JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64/jre"
 
+# update APT cache and install required packages
+RUN apt-get update && \
+    apt-get -y --no-install-recommends install \
+    wget \
+    openjdk-8-jre-headless \
+    gnupg2 \
+    dirmngr && \
+    rm -rf /var/lib/apt/lists/*
 
-ENV JAVA_HOME=/usr/lib/jvm/jre
-ENV IDP_SRC=/usr/local/src/shibboleth-identity-provider-3.3.1
+# Jetty
+ENV JETTY_VERSION="9.3.20.v20170531" \
+    JETTY_KEY="2D0E1FB8FE4B68B4" \
+    PASSWORD_CERT_KEY="jo7ahrie6aecoog2Eeng" \
+    PASSWORD_PKCS12="aiveibooch1Ohk9ahxi3" \
+    PASSWORD_KEYSTORE="oe7taiXiopiex2jusei8"
 
+COPY jetty-keystore.sh key.pem cert.pem /tmp/
 
+RUN groupadd idp && \
+    useradd -m -g idp -s /bin/bash idp && \
+    mkdir -p /opt/src /opt/jetty && \
+    chown idp:idp /opt/src /opt/jetty && \
+    wget -q -P /opt/src http://central.maven.org/maven2/org/eclipse/jetty/jetty-distribution/$JETTY_VERSION/jetty-distribution-$JETTY_VERSION.tar.gz \
+                        http://central.maven.org/maven2/org/eclipse/jetty/jetty-distribution/$JETTY_VERSION/jetty-distribution-$JETTY_VERSION.tar.gz.sha1 \
+                        http://central.maven.org/maven2/org/eclipse/jetty/jetty-distribution/$JETTY_VERSION/jetty-distribution-$JETTY_VERSION.tar.gz.asc \
+                        http://central.maven.org/maven2/org/eclipse/jetty/jetty-distribution/$JETTY_VERSION/jetty-distribution-$JETTY_VERSION.tar.gz.asc.sha1 && \
+    echo `cat /opt/src/jetty-distribution-$JETTY_VERSION.tar.gz.sha1` /opt/src/jetty-distribution-$JETTY_VERSION.tar.gz | sha1sum -c && \
+    gpg --recv-keys $JETTY_KEY && \
+    gpg --verify /opt/src/jetty-distribution-$JETTY_VERSION.tar.gz.asc && \
+    tar -xzf /opt/src/jetty-distribution-$JETTY_VERSION.tar.gz -C /opt && \
+    chown -R idp:idp /opt/jetty-distribution-$JETTY_VERSION && \
+    ln -snf /opt/jetty-distribution-$JETTY_VERSION/bin/jetty.sh /etc/init.d/jetty && \
+    echo "JETTY_HOME=/opt/jetty-distribution-$JETTY_VERSION/" > /etc/default/jetty && \
+    echo "JETTY_BASE=/opt/jetty" >> /etc/default/jetty && \
+    echo "JETTY_USER=idp" >> /etc/default/jetty && \
+    cd /opt/jetty && \
+    java -jar /opt/jetty-distribution-$JETTY_VERSION/start.jar --add-to-startd=http,https,logging,deploy,jsp,jstl,plus,servlets,annotations,ext,resources,logging,requestlog && \
+    mkdir -p /opt/jetty/webapps/root && \
+    echo "stretch-shib-idp-test01" >> /opt/jetty/webapps/root/index.html && \
+    wget -q -P /opt/jetty/webapps https://www.eduid.cz/_media/cs/tech/idp/idp.xml && \
+    wget -q -P /opt/jetty/etc https://www.eduid.cz/_media/cs/tech/idp/tweak-ssl.xml && \
+    echo etc/tweak-ssl.xml >> /opt/jetty/start.d/https.ini && \
+    chown -R idp:idp /opt/jetty/ /opt/jetty-distribution*/ && \
+    /tmp/jetty-keystore.sh $JETTY_VERSION $PASSWORD_CERT_KEY $PASSWORD_PKCS12 $PASSWORD_KEYSTORE
 
-# Update image
-RUN yum update -y
-RUN yum install -y dnf install vim-enhanced java-1.8.0-openjdk java-1.8.0-openjdk-devel ca-certificates openssl httpd mod_ssl expat wget tar ntp initscripts.x86_64
+# Shibboleth IdP
+ENV SHIBBOLETH_VERSION="3.3.1" \
+    SHIBBOLETH_KEY="07CEEB8B" \
+    SHIBBOLETH_SCOPE="devnull.cesnet.cz" \
+    SHIBBOLETH_ENTITYID="https://devnull.cesnet.cz/idp/shibboleth" \
+    SHIBBOLETH_HOSTNAME="devnull.cesnet.cz" \
+    SHIBBOLETH_PASSWORD_SEALER="aif8ohx6sheetai0Gae1" \
+    SHIBBOLETH_PASSWORD_KEYSTORE="yifohToh5cafoonai5ie"
 
+RUN wget -q -P /opt/src/ https://shibboleth.net/downloads/identity-provider/$SHIBBOLETH_VERSION/shibboleth-identity-provider-$SHIBBOLETH_VERSION.tar.gz \
+                         https://shibboleth.net/downloads/identity-provider/$SHIBBOLETH_VERSION/shibboleth-identity-provider-$SHIBBOLETH_VERSION.tar.gz.asc \
+                         https://shibboleth.net/downloads/identity-provider/$SHIBBOLETH_VERSION/shibboleth-identity-provider-$SHIBBOLETH_VERSION.tar.gz.sha256 && \
+    cd /opt/src && sha256sum -c shibboleth-identity-provider-$SHIBBOLETH_VERSION.tar.gz.sha256 && \
+    gpg --recv-keys $SHIBBOLETH_KEY && \
+    gpg --verify /opt/src/shibboleth-identity-provider-$SHIBBOLETH_VERSION.tar.gz.asc && \
+    tar -xzf /opt/src/shibboleth-identity-provider-$SHIBBOLETH_VERSION.tar.gz -C /opt && \
+    echo idp.no.tidy=true>>/opt/idp.install.properties && \
+    echo idp.scope=$SHIBBOLETH_SCOPE>>/opt/idp.merge.properties && \
+    echo idp.entityID=$SHIBBOLETH_ENTITYID>>/opt/idp.merge.properties && \
+    echo idp.sealer.storePassword=$SHIBBOLETH_PASSWORD_SEALER>>/opt/idp.merge.properties && \
+    echo idp.sealer.keyPassword=$SHIBBOLETH_PASSWORD_SEALER>>/opt/idp.merge.properties && \
+    /opt/shibboleth-identity-provider-$SHIBBOLETH_VERSION/bin/install.sh \
+        -Didp.property.file=/opt/idp.install.properties \
+        -Didp.merge.properties=/opt/idp.merge.properties \
+        -Didp.src.dir=/opt/shibboleth-identity-provider-$SHIBBOLETH_VERSION \
+        -Didp.target.dir=/opt/shibboleth-idp \
+        -Didp.scope=$SHIBBOLETH_SCOPE \
+        -Didp.host.name=$SHIBBOLETH_HOSTNAME \
+        -Didp.sealer.password=$SHIBBOLETH_PASSWORD_SEALER \
+        -Didp.keystore.password=$SHIBBOLETH_PASSWORD_KEYSTORE \
+        -Didp.noprompt=true
 
-RUN set -x; \
-    echo "127.0.0.1 geantsrv7.ct1.garrservices.it geantsrv7" >> /etc/hosts; \
-    cat /etc/hosts
+# Clean packages
+RUN apt-get -y purge \
+    wget \
+    gnupg2 \
+    dirmngr && \
+    apt-get -y autoremove
 
-RUN set -x; \
-    touch /etc/environment; \
-    echo "JAVA_HOME=/usr/lib/jvm/jre" >> /etc/environment; \
-    echo "IDP_SRC=/usr/local/src/shibboleth-identity-provider-3.3.1" >> /etc/environment; \
-    cat  /etc/environment
+# Clean source codes
+RUN rm -rf /opt/src
 
-RUN set -x; \
-    mkdir -p /root/certificates
+EXPOSE 8080 8443
 
-ADD idp-cert-server.crt /root/certificates/idp-cert-server.crt
-ADD idp-key-server.key /root/certificates/idp-key-server.key
-ADD DigiCertCA.crt /root/certificates/DigiCertCA.crt
+#CMD ["/bin/bash"]
 
-RUN set -x; \
-    chmod 400 /root/certificates/idp-key-server.key; \
-    chmod 644 /root/certificates/idp-cert-server.crt; \
-    chmod 644 /root/certificates/DigiCertCA.crt
-
-RUN  set -x; \
-     echo 1 | update-alternatives --config java ; \
-     echo 1 | update-alternatives --config javac 
-
-RUN set -x; \
-    touch /etc/default/jetty; \
-    echo "JETTY_HOME=/usr/local/src/jetty-src" >> /etc/default/jetty; \
-    echo "JETTY_BASE=/opt/jetty" >> /etc/default/jetty; \
-    echo "JETTY_USER=jetty" >> /etc/default/jetty; \
-    echo "JETTY_LOGS=/var/log/jetty" >>  /etc/default/jetty; \
-    echo "TMPDIR=/opt/jetty/tmp" >> /etc/default/jetty; \
-    echo "JAVA_OPTIONS=\"-Djava.awt.headless=true -XX:+DisableExplicitGC -XX:+UseParallelOldGC -Xms256m -Xmx2g -Djava.security.egd=file:/dev/./urandom -Didp.home=/opt/shibboleth-idp\"" >> /etc/default/jetty 
-
-WORKDIR /usr/local/src
-
-RUN  set -x; \
-     wget http://repo1.maven.org/maven2/org/eclipse/jetty/jetty-distribution/9.3.11.v20160721/jetty-distribution-9.3.11.v20160721.tar.gz; \
-     tar xzvf jetty-distribution-9.3.11.v20160721.tar.gz; \
-     ln -s jetty-distribution-9.3.11.v20160721 jetty-src; \ 
-     useradd -r -m jetty; \
-     mkdir /opt/jetty
-
-WORKDIR /opt/jetty
-
-ADD start.ini /opt/jetty/start.ini 
-
-RUN set -x; \
-    mkdir /opt/jetty/tmp ; \
-    chown jetty:jetty /opt/jetty/tmp; \
-    chown -R jetty:jetty /opt/jetty/ /usr/local/src/jetty-src
-
-WORKDIR /etc/init.d
-
-RUN set -x; \
-    ln -s /usr/local/src/jetty-src/bin/jetty.sh jetty; \
-    chkconfig jetty on; \
-    mkdir /var/log/jetty; \ 
-    chown jetty:jetty /var/log/jetty
-
-EXPOSE 4443 8443
-
-
-CMD ["start"]
-ENTRYPOINT ["jetty.sh"]
-
-CMD ["check"]
-ENTRYPOINT ["jetty.sh"]
-
-
-# Install Shibboleth
-
-WORKDIR /usr/local/src
-
-RUN set -x; \
-    wget http://shibboleth.net/downloads/identity-provider/3.3.1/shibboleth-identity-provider-3.3.1.tar.gz; \
-    tar -xzvf shibboleth-identity-provider-3.3.1.tar.gz; 
-
-WORKDIR  /usr/local/src/shibboleth-identity-provider-3.3.1
-
-## need to sort out : how to run the shib install.sh script within the container
-
+CMD ["sh", "-c", "java \
+    -Djetty.logging.dir=/opt/jetty/logs \
+    -Djetty.home=/opt/jetty-distribution-$JETTY_VERSION \
+    -Djetty.base=/opt/jetty \
+    -Djava.io.tmpdir=/tmp \
+    -jar \
+    /opt/jetty-distribution-$JETTY_VERSION/start.jar \
+    jetty.state=/opt/jetty/jetty.state \
+    jetty-logging.xml \
+    jetty-started.xml \
+    start-log-file=/opt/jetty/logs/start.log"]
 
