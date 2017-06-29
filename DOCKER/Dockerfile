@@ -8,7 +8,7 @@ ENV JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64/jre"
 RUN apt-get update && \
     apt-get -y --no-install-recommends install \
     wget \
-    openjdk-8-jre \
+    openjdk-8-jre-headless \
     vim \
     less && \
     rm -rf /var/lib/apt/lists/*
