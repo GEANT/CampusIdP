@@ -6,13 +6,14 @@ ENV JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64/jre"
 
 # update APT cache and install required packages
 RUN apt-get update && \
-    apt-get -y install \
+    apt-get -y --no-install-recommends install \
     wget \
-    openjdk-8-jre \
+    openjdk-8-jre-headless \
     vim \
     less \
     gnupg2 \
-    dirmngr
+    dirmngr && \
+    rm -rf /var/lib/apt/lists/*
 
 # Jetty
 ENV JETTY_VERSION="9.3.20.v20170531" \
@@ -81,6 +82,16 @@ RUN wget -q -P /opt/src/ https://shibboleth.net/downloads/identity-provider/$SHI
         -Didp.sealer.password=$SHIBBOLETH_PASSWORD_SEALER \
         -Didp.keystore.password=$SHIBBOLETH_PASSWORD_KEYSTORE \
         -Didp.noprompt=true
+
+# Clean packages
+RUN apt-get -y purge \
+    wget \
+    gnupg2 \
+    dirmngr && \
+    apt-get -y autoremove
+
+# Clean source codes
+RUN rm -rf /opt/src
 
 EXPOSE 8080 8443
 
