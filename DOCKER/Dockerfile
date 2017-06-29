@@ -6,7 +6,7 @@ ENV JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64/jre"
 
 # update APT cache and install required packages
 RUN apt-get update && \
-    apt-get -y install \
+    apt-get -y --no-install-recommends install \
     wget \
     openjdk-8-jre \
     vim \
