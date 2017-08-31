@@ -17,4 +17,3 @@ docker container run \
     -v /var/tmp/docker-logs-jetty:/opt/jetty/logs \
     -v /var/tmp/docker-logs-shibboleth:/opt/shibboleth-idp/logs \
     stretch-shib-idp-test01$TAG
-

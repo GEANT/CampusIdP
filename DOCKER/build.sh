@@ -9,4 +9,3 @@ else
 fi
 
 docker image build -t stretch-shib-idp-test01$TAG .
-
