@@ -7,7 +7,7 @@ if [[ $1 ]]; then
     TAG=":$1"
 fi
 
-docker run \
+docker container run \
     -it \
     --rm \
     --detach \

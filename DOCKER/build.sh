@@ -8,5 +8,5 @@ else
     TAG=":latest"
 fi
 
-docker build -t stretch-shib-idp-test01$TAG .
+docker image build -t stretch-shib-idp-test01$TAG .
 

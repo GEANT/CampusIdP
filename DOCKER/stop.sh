@@ -1,4 +1,4 @@
 #!/bin/bash
 
-docker stop stretch-shib-idp-test01
+docker container stop stretch-shib-idp-test01
 
