@@ -18,7 +18,7 @@ You just need to follow these steps:
 To get Shibboleth IdP up and running. However, no configuration (LDAP etc.) is available at this moment.
 
 You can check that the IdP is running by accessing ports `8080` (*HTTP*) and `8443` (*HTTPS*). For example, to show IdP's metadata go to the following URL address:
-* `http://your_machine_IP_address:8443/idp/shibboleth`
+* `https://your_machine_IP_address:8443/idp/shibboleth`
 
 Status of the IdP can be obtained using a shell. One just need to attach the running Docker container and check `idp-process.log` log file which should contain the following line:
 ```bash
