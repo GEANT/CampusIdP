@@ -2,7 +2,8 @@ FROM debian:stretch
 
 MAINTAINER Jan Oppolzer <jan.oppolzer@cesnet.cz>
 
-ENV JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64/jre"
+ARG JAVA_HOME
+ENV JAVA_HOME=$JAVA_HOME
 
 # update APT cache and install required packages
 RUN apt-get update && \
@@ -14,11 +15,17 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 # Jetty
-ENV JETTY_VERSION="9.3.20.v20170531" \
-    JETTY_KEY="2D0E1FB8FE4B68B4" \
-    PASSWORD_CERT_KEY="jo7ahrie6aecoog2Eeng" \
-    PASSWORD_PKCS12="aiveibooch1Ohk9ahxi3" \
-    PASSWORD_KEYSTORE="oe7taiXiopiex2jusei8"
+ARG JETTY_VERSION
+ARG JETTY_KEY
+ARG PASSWORD_CERT_KEY
+ARG PASSWORD_PKCS12
+ARG PASSWORD_KEYSTORE
+
+ENV JETTY_VERSION=$JETTY_VERSION \
+    JETTY_KEY=$JETTY_KEY \
+    PASSWORD_CERT_KEY=$PASSWORD_CERT_KEY \
+    PASSWORD_PKCS12=$PASSWORD_PKCS12 \
+    PASSWORD_KEYSTORE=$PASSWORD_KEYSTORE
 
 COPY jetty-keystore.sh key.pem cert.pem /tmp/
 
@@ -50,13 +57,21 @@ RUN groupadd idp && \
     /tmp/jetty-keystore.sh $JETTY_VERSION $PASSWORD_CERT_KEY $PASSWORD_PKCS12 $PASSWORD_KEYSTORE
 
 # Shibboleth IdP
-ENV SHIBBOLETH_VERSION="3.3.1" \
-    SHIBBOLETH_KEY="07CEEB8B" \
-    SHIBBOLETH_SCOPE="devnull.cesnet.cz" \
-    SHIBBOLETH_ENTITYID="https://devnull.cesnet.cz/idp/shibboleth" \
-    SHIBBOLETH_HOSTNAME="devnull.cesnet.cz" \
-    SHIBBOLETH_PASSWORD_SEALER="aif8ohx6sheetai0Gae1" \
-    SHIBBOLETH_PASSWORD_KEYSTORE="yifohToh5cafoonai5ie"
+ARG SHIBBOLETH_VERSION
+ARG SHIBBOLETH_KEY
+ARG SHIBBOLETH_SCOPE
+ARG SHIBBOLETH_ENTITYID
+ARG SHIBBOLETH_HOSTNAME
+ARG SHIBBOLETH_PASSWORD_SEALER
+ARG SHIBBOLETH_PASSWORD_KEYSTORE
+
+ENV SHIBBOLETH_VERSION=$SHIBBOLETH_VERSION \
+    SHIBBOLETH_KEY=$SHIBBOLETH_KEY \
+    SHIBBOLETH_SCOPE=$SHIBBOLETH_SCOPE \
+    SHIBBOLETH_ENTITYID=$SHIBBOLETH_ENTITYID \
+    SHIBBOLETH_HOSTNAME=$SHIBBOLETH_HOSTNAME \
+    SHIBBOLETH_PASSWORD_SEALER=$SHIBBOLETH_PASSWORD_SEALER \
+    SHIBBOLETH_PASSWORD_KEYSTORE=$SHIBBOLETH_PASSWORD_KEYSTORE
 
 RUN wget -q -P /opt/src/ https://shibboleth.net/downloads/identity-provider/$SHIBBOLETH_VERSION/shibboleth-identity-provider-$SHIBBOLETH_VERSION.tar.gz \
                          https://shibboleth.net/downloads/identity-provider/$SHIBBOLETH_VERSION/shibboleth-identity-provider-$SHIBBOLETH_VERSION.tar.gz.asc \
