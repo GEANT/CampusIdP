@@ -2,7 +2,8 @@ FROM debian:stretch
 
 MAINTAINER Jan Oppolzer <jan.oppolzer@cesnet.cz>
 
-ENV JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64/jre"
+ARG JAVA_HOME
+ENV JAVA_HOME=$JAVA_HOME
 
 # update APT cache and install required packages
 RUN apt-get update && \

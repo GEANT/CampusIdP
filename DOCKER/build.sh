@@ -8,4 +8,8 @@ else
     TAG=":latest"
 fi
 
-docker image build -t stretch-shib-idp-test01$TAG .
+source ./buildenv.conf
+docker image build \
+    --build-arg JAVA_HOME=$JAVA_HOME \
+    -t stretch-shib-idp-test01$TAG .
+
