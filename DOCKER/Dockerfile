@@ -76,15 +76,17 @@ COPY jetty-keystore.sh key.pem cert.pem /tmp/
 RUN echo "stretch-shib-idp-test01" >> /opt/jetty/webapps/root/index.html && \
     /tmp/jetty-keystore.sh $JETTY_VERSION $PASSWORD_CERT_KEY $PASSWORD_PKCS12 $PASSWORD_KEYSTORE
 
-# Shibboleth IdP
+# Shibboleth IdP -- common steps
 RUN wget -q -P /opt/src/ https://shibboleth.net/downloads/identity-provider/$SHIBBOLETH_VERSION/shibboleth-identity-provider-$SHIBBOLETH_VERSION.tar.gz \
                          https://shibboleth.net/downloads/identity-provider/$SHIBBOLETH_VERSION/shibboleth-identity-provider-$SHIBBOLETH_VERSION.tar.gz.asc \
                          https://shibboleth.net/downloads/identity-provider/$SHIBBOLETH_VERSION/shibboleth-identity-provider-$SHIBBOLETH_VERSION.tar.gz.sha256 && \
     cd /opt/src && sha256sum -c shibboleth-identity-provider-$SHIBBOLETH_VERSION.tar.gz.sha256 && \
     gpg -q --keyserver pgp.mit.edu --recv-keys $SHIBBOLETH_KEY && \
     gpg -q --verify /opt/src/shibboleth-identity-provider-$SHIBBOLETH_VERSION.tar.gz.asc && \
-    tar -xzf /opt/src/shibboleth-identity-provider-$SHIBBOLETH_VERSION.tar.gz -C /opt && \
-    echo idp.no.tidy=true>>/opt/idp.install.properties && \
+    tar -xzf /opt/src/shibboleth-identity-provider-$SHIBBOLETH_VERSION.tar.gz -C /opt
+
+# Shibboleth IdP -- container dependent steps
+RUN echo idp.no.tidy=true>>/opt/idp.install.properties && \
     echo idp.scope=$SHIBBOLETH_SCOPE>>/opt/idp.merge.properties && \
     echo idp.entityID=$SHIBBOLETH_ENTITYID>>/opt/idp.merge.properties && \
     echo idp.sealer.storePassword=$SHIBBOLETH_PASSWORD_SEALER>>/opt/idp.merge.properties && \
