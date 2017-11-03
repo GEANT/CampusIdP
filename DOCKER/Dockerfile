@@ -81,9 +81,9 @@ RUN wget -q -P /opt/src/ https://shibboleth.net/downloads/identity-provider/$SHI
     tar -xzf /opt/src/shibboleth-identity-provider-$SHIBBOLETH_VERSION.tar.gz -C /opt
 
 # Jetty -- container dependent steps
-COPY jetty-keystore.sh key.pem cert.pem /tmp/
+COPY jetty-keystore.sh certificates/$SHIBBOLETH_HOSTNAME.key.pem certificates/$SHIBBOLETH_HOSTNAME.crt.pem /tmp/
 RUN echo $SHIBBOLETH_ENTITYID >> /opt/jetty/webapps/root/index.html && \
-    /tmp/jetty-keystore.sh $JETTY_VERSION $PASSWORD_CERT_KEY $PASSWORD_PKCS12 $PASSWORD_KEYSTORE
+    /tmp/jetty-keystore.sh $JETTY_VERSION $PASSWORD_CERT_KEY $PASSWORD_PKCS12 $PASSWORD_KEYSTORE $SHIBBOLETH_HOSTNAME
 
 # Shibboleth IdP -- container dependent steps
 RUN echo idp.no.tidy=true>>/opt/idp.install.properties && \
