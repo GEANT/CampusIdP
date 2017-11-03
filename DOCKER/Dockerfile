@@ -20,8 +20,8 @@ ENV SHIBBOLETH_VERSION=$SHIBBOLETH_VERSION \
     SHIBBOLETH_KEY=$SHIBBOLETH_KEY
 
 # update APT cache and install required packages
-RUN apt-get update && \
-    apt-get -y --no-install-recommends install \
+RUN apt-get -qq update && \
+    apt-get -qq -y --no-install-recommends install \
     wget \
     openjdk-8-jre-headless \
     gnupg2 \
@@ -108,11 +108,11 @@ RUN echo idp.no.tidy=true>>/opt/idp.install.properties && \
         -Didp.noprompt=true
 
 # Clean packages
-RUN apt-get -y purge \
+RUN apt-get -qq -y purge \
     wget \
     gnupg2 \
     dirmngr && \
-    apt-get -y autoremove
+    apt-get -qq -y autoremove
 
 # Clean source codes
 RUN rm -rf /opt/src
