@@ -20,8 +20,8 @@ ENV SHIBBOLETH_VERSION=$SHIBBOLETH_VERSION \
     SHIBBOLETH_KEY=$SHIBBOLETH_KEY
 
 # update APT cache and install required packages
-RUN apt-get update && \
-    apt-get -y --no-install-recommends install \
+RUN apt-get -qq update && \
+    apt-get -qq -y --no-install-recommends install \
     wget \
     openjdk-8-jre-headless \
     gnupg2 \
@@ -49,10 +49,11 @@ RUN groupadd idp && \
     cd /opt/jetty && \
     java -jar /opt/jetty-distribution-$JETTY_VERSION/start.jar --add-to-startd=http,https,logging,deploy,jsp,jstl,plus,servlets,annotations,ext,resources,logging,requestlog && \
     mkdir -p /opt/jetty/webapps/root && \
-    wget -q -P /opt/jetty/webapps https://www.eduid.cz/_media/cs/tech/idp/idp.xml && \
-    wget -q -P /opt/jetty/etc https://www.eduid.cz/_media/cs/tech/idp/tweak-ssl.xml && \
     echo etc/tweak-ssl.xml >> /opt/jetty/start.d/https.ini && \
     chown -R idp:idp /opt/jetty/ /opt/jetty-distribution*/
+
+COPY jetty/idp.xml /opt/jetty/webapps
+COPY jetty/tweak-ssl.xml /opt/jetty/etc
 
 # Shibboleth IdP -- common steps
 RUN wget -q -P /opt/src/ https://shibboleth.net/downloads/identity-provider/$SHIBBOLETH_VERSION/shibboleth-identity-provider-$SHIBBOLETH_VERSION.tar.gz \
@@ -107,11 +108,11 @@ RUN echo idp.no.tidy=true>>/opt/idp.install.properties && \
         -Didp.noprompt=true
 
 # Clean packages
-RUN apt-get -y purge \
+RUN apt-get -qq -y purge \
     wget \
     gnupg2 \
     dirmngr && \
-    apt-get -y autoremove
+    apt-get -qq -y autoremove
 
 # Clean source codes
 RUN rm -rf /opt/src
