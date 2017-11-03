@@ -71,11 +71,6 @@ RUN groupadd idp && \
     echo etc/tweak-ssl.xml >> /opt/jetty/start.d/https.ini && \
     chown -R idp:idp /opt/jetty/ /opt/jetty-distribution*/
 
-# Jetty -- container dependent steps
-COPY jetty-keystore.sh key.pem cert.pem /tmp/
-RUN echo "stretch-shib-idp-test01" >> /opt/jetty/webapps/root/index.html && \
-    /tmp/jetty-keystore.sh $JETTY_VERSION $PASSWORD_CERT_KEY $PASSWORD_PKCS12 $PASSWORD_KEYSTORE
-
 # Shibboleth IdP -- common steps
 RUN wget -q -P /opt/src/ https://shibboleth.net/downloads/identity-provider/$SHIBBOLETH_VERSION/shibboleth-identity-provider-$SHIBBOLETH_VERSION.tar.gz \
                          https://shibboleth.net/downloads/identity-provider/$SHIBBOLETH_VERSION/shibboleth-identity-provider-$SHIBBOLETH_VERSION.tar.gz.asc \
@@ -84,6 +79,11 @@ RUN wget -q -P /opt/src/ https://shibboleth.net/downloads/identity-provider/$SHI
     gpg -q --keyserver pgp.mit.edu --recv-keys $SHIBBOLETH_KEY && \
     gpg -q --verify /opt/src/shibboleth-identity-provider-$SHIBBOLETH_VERSION.tar.gz.asc && \
     tar -xzf /opt/src/shibboleth-identity-provider-$SHIBBOLETH_VERSION.tar.gz -C /opt
+
+# Jetty -- container dependent steps
+COPY jetty-keystore.sh key.pem cert.pem /tmp/
+RUN echo "stretch-shib-idp-test01" >> /opt/jetty/webapps/root/index.html && \
+    /tmp/jetty-keystore.sh $JETTY_VERSION $PASSWORD_CERT_KEY $PASSWORD_PKCS12 $PASSWORD_KEYSTORE
 
 # Shibboleth IdP -- container dependent steps
 RUN echo idp.no.tidy=true>>/opt/idp.install.properties && \
