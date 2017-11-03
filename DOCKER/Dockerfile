@@ -45,9 +45,7 @@ RUN apt-get update && \
     dirmngr && \
     rm -rf /var/lib/apt/lists/*
 
-# Jetty
-COPY jetty-keystore.sh key.pem cert.pem /tmp/
-
+# Jetty -- common steps
 RUN groupadd idp && \
     useradd -m -g idp -s /bin/bash idp && \
     mkdir -p /opt/src /opt/jetty && \
@@ -68,11 +66,14 @@ RUN groupadd idp && \
     cd /opt/jetty && \
     java -jar /opt/jetty-distribution-$JETTY_VERSION/start.jar --add-to-startd=http,https,logging,deploy,jsp,jstl,plus,servlets,annotations,ext,resources,logging,requestlog && \
     mkdir -p /opt/jetty/webapps/root && \
-    echo "stretch-shib-idp-test01" >> /opt/jetty/webapps/root/index.html && \
     wget -q -P /opt/jetty/webapps https://www.eduid.cz/_media/cs/tech/idp/idp.xml && \
     wget -q -P /opt/jetty/etc https://www.eduid.cz/_media/cs/tech/idp/tweak-ssl.xml && \
     echo etc/tweak-ssl.xml >> /opt/jetty/start.d/https.ini && \
-    chown -R idp:idp /opt/jetty/ /opt/jetty-distribution*/ && \
+    chown -R idp:idp /opt/jetty/ /opt/jetty-distribution*/
+
+# Jetty -- container dependent steps
+COPY jetty-keystore.sh key.pem cert.pem /tmp/
+RUN echo "stretch-shib-idp-test01" >> /opt/jetty/webapps/root/index.html && \
     /tmp/jetty-keystore.sh $JETTY_VERSION $PASSWORD_CERT_KEY $PASSWORD_PKCS12 $PASSWORD_KEYSTORE
 
 # Shibboleth IdP
