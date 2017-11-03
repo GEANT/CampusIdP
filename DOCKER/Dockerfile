@@ -82,7 +82,7 @@ RUN wget -q -P /opt/src/ https://shibboleth.net/downloads/identity-provider/$SHI
 
 # Jetty -- container dependent steps
 COPY jetty-keystore.sh key.pem cert.pem /tmp/
-RUN echo "stretch-shib-idp-test01" >> /opt/jetty/webapps/root/index.html && \
+RUN echo $SHIBBOLETH_ENTITYID >> /opt/jetty/webapps/root/index.html && \
     /tmp/jetty-keystore.sh $JETTY_VERSION $PASSWORD_CERT_KEY $PASSWORD_PKCS12 $PASSWORD_KEYSTORE
 
 # Shibboleth IdP -- container dependent steps
