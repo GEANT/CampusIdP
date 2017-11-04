@@ -107,6 +107,15 @@ RUN echo idp.no.tidy=true>>/opt/idp.install.properties && \
         -Didp.keystore.password=$SHIBBOLETH_PASSWORD_KEYSTORE \
         -Didp.noprompt=true
 
+# Shibboleth IdP -- copy host-specific configuration files
+COPY hosts/$SHIBBOLETH_HOSTNAME/attribute-filter.xml.test \
+     hosts/$SHIBBOLETH_HOSTNAME/attribute-resolver.xml.test \
+     hosts/$SHIBBOLETH_HOSTNAME/idp.properties.test \
+     hosts/$SHIBBOLETH_HOSTNAME/ldap.properties.test \
+     hosts/$SHIBBOLETH_HOSTNAME/metadata-providers.xml.test \
+     hosts/$SHIBBOLETH_HOSTNAME/relying-party.xml.test \
+     /opt/shibboleth-idp/conf/
+
 # Clean packages
 RUN apt-get -qq -y purge \
     wget \
