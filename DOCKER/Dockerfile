@@ -64,6 +64,16 @@ RUN wget -q -P /opt/src/ https://shibboleth.net/downloads/identity-provider/$SHI
     gpg -q --verify /opt/src/shibboleth-identity-provider-$SHIBBOLETH_VERSION.tar.gz.asc && \
     tar -xzf /opt/src/shibboleth-identity-provider-$SHIBBOLETH_VERSION.tar.gz -C /opt
 
+# Clean packages
+RUN apt-get -qq -y purge \
+    wget \
+    gnupg2 \
+    dirmngr && \
+    apt-get -qq -y autoremove
+
+# Clean source codes
+RUN rm -rf /opt/src
+
 # Container dependent variables
 ## Jetty
 ARG PASSWORD_CERT_KEY
@@ -115,16 +125,6 @@ COPY hosts/$SHIBBOLETH_HOSTNAME/attribute-filter.xml.test \
      hosts/$SHIBBOLETH_HOSTNAME/metadata-providers.xml.test \
      hosts/$SHIBBOLETH_HOSTNAME/relying-party.xml.test \
      /opt/shibboleth-idp/conf/
-
-# Clean packages
-RUN apt-get -qq -y purge \
-    wget \
-    gnupg2 \
-    dirmngr && \
-    apt-get -qq -y autoremove
-
-# Clean source codes
-RUN rm -rf /opt/src
 
 EXPOSE 8080 8443
 
