@@ -1,3 +1,6 @@
 #!/bin/bash
 
-docker container stop stretch-shib-idp-test01
+source ./buildenv.conf
+
+docker container stop idp-$SHIBBOLETH_HOSTNAME
+

@@ -1,4 +1,6 @@
 #!/bin/bash
 
-docker image rm stretch-shib-idp-test01
+source ./buildenv.conf
+
+docker image rm idp-$SHIBBOLETH_HOSTNAME
 
