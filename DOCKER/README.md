@@ -3,8 +3,8 @@
 In case, you have:
 
 1. Working Docker environment. The official latest version required -- 17.09.0-ce.
-2. A certificate with the full chain in `certificates/$FQDN.crt.pem` file.
-3. A private key in `certificates/$FQDN.key.pem` file.
+2. A certificate with the full chain in `hosts/$FQDN/cert.pem` file.
+3. A private key in `hosts/$FQDN/key.pem` file.
 
 You just need to follow these steps:
 

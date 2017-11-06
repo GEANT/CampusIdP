@@ -64,6 +64,16 @@ RUN wget -q -P /opt/src/ https://shibboleth.net/downloads/identity-provider/$SHI
     gpg -q --verify /opt/src/shibboleth-identity-provider-$SHIBBOLETH_VERSION.tar.gz.asc && \
     tar -xzf /opt/src/shibboleth-identity-provider-$SHIBBOLETH_VERSION.tar.gz -C /opt
 
+# Clean packages
+RUN apt-get -qq -y purge \
+    wget \
+    gnupg2 \
+    dirmngr && \
+    apt-get -qq -y autoremove
+
+# Clean source codes
+RUN rm -rf /opt/src
+
 # Container dependent variables
 ## Jetty
 ARG PASSWORD_CERT_KEY
@@ -86,7 +96,7 @@ ENV SHIBBOLETH_SCOPE=$SHIBBOLETH_SCOPE \
     SHIBBOLETH_PASSWORD_KEYSTORE=$SHIBBOLETH_PASSWORD_KEYSTORE
 
 # Jetty -- container dependent steps
-COPY jetty-keystore.sh certificates/$SHIBBOLETH_HOSTNAME.key.pem certificates/$SHIBBOLETH_HOSTNAME.crt.pem /tmp/
+COPY jetty-keystore.sh hosts/$SHIBBOLETH_HOSTNAME/key.pem hosts/$SHIBBOLETH_HOSTNAME/cert.pem /tmp/
 RUN echo $SHIBBOLETH_ENTITYID >> /opt/jetty/webapps/root/index.html && \
     /tmp/jetty-keystore.sh $JETTY_VERSION $PASSWORD_CERT_KEY $PASSWORD_PKCS12 $PASSWORD_KEYSTORE $SHIBBOLETH_HOSTNAME
 
@@ -107,15 +117,17 @@ RUN echo idp.no.tidy=true>>/opt/idp.install.properties && \
         -Didp.keystore.password=$SHIBBOLETH_PASSWORD_KEYSTORE \
         -Didp.noprompt=true
 
-# Clean packages
-RUN apt-get -qq -y purge \
-    wget \
-    gnupg2 \
-    dirmngr && \
-    apt-get -qq -y autoremove
+# Shibboleth IdP -- copy host-specific configuration files
+COPY hosts/$SHIBBOLETH_HOSTNAME/attribute-filter.xml \
+     hosts/$SHIBBOLETH_HOSTNAME/attribute-resolver.xml \
+     hosts/$SHIBBOLETH_HOSTNAME/ldap.properties \
+     hosts/$SHIBBOLETH_HOSTNAME/metadata-providers.xml \
+     hosts/$SHIBBOLETH_HOSTNAME/relying-party.xml \
+     /opt/shibboleth-idp/conf/
 
-# Clean source codes
-RUN rm -rf /opt/src
+COPY hosts/$SHIBBOLETH_HOSTNAME/ldap-server.crt \
+     hosts/$SHIBBOLETH_HOSTNAME/metadata.eduid.cz.crt.pem \
+     /opt/shibboleth-idp/credentials/
 
 EXPOSE 8080 8443
 
