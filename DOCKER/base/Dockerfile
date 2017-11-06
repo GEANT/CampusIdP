@@ -1,0 +1,78 @@
+FROM debian:stretch
+
+MAINTAINER Jan Oppolzer <jan@oppolzer.cz>
+
+# Common variables
+## Java
+ARG JAVA_HOME
+ENV JAVA_HOME=$JAVA_HOME
+
+## Jetty
+ARG JETTY_VERSION
+ARG JETTY_KEY
+ENV JETTY_VERSION=$JETTY_VERSION \
+    JETTY_KEY=$JETTY_KEY
+
+## Shibboleth IdP
+ARG SHIBBOLETH_VERSION
+ARG SHIBBOLETH_KEY
+ENV SHIBBOLETH_VERSION=$SHIBBOLETH_VERSION \
+    SHIBBOLETH_KEY=$SHIBBOLETH_KEY
+
+# update APT cache and install required packages
+RUN apt-get -qq update && \
+    apt-get -qq -y --no-install-recommends install \
+    wget \
+    openjdk-8-jre-headless \
+    gnupg2 \
+    dirmngr && \
+    rm -rf /var/lib/apt/lists/*
+
+# Jetty -- common steps
+RUN groupadd idp && \
+    useradd -m -g idp -s /bin/bash idp && \
+    mkdir -p /opt/src /opt/jetty && \
+    chown idp:idp /opt/src /opt/jetty && \
+    wget -q -P /opt/src http://central.maven.org/maven2/org/eclipse/jetty/jetty-distribution/$JETTY_VERSION/jetty-distribution-$JETTY_VERSION.tar.gz \
+                        http://central.maven.org/maven2/org/eclipse/jetty/jetty-distribution/$JETTY_VERSION/jetty-distribution-$JETTY_VERSION.tar.gz.sha1 \
+                        http://central.maven.org/maven2/org/eclipse/jetty/jetty-distribution/$JETTY_VERSION/jetty-distribution-$JETTY_VERSION.tar.gz.asc \
+                        http://central.maven.org/maven2/org/eclipse/jetty/jetty-distribution/$JETTY_VERSION/jetty-distribution-$JETTY_VERSION.tar.gz.asc.sha1 && \
+    echo `cat /opt/src/jetty-distribution-$JETTY_VERSION.tar.gz.sha1` /opt/src/jetty-distribution-$JETTY_VERSION.tar.gz | sha1sum -c && \
+    gpg -q --keyserver pgp.mit.edu --recv-keys $JETTY_KEY && \
+    gpg -q --verify /opt/src/jetty-distribution-$JETTY_VERSION.tar.gz.asc && \
+    tar -xzf /opt/src/jetty-distribution-$JETTY_VERSION.tar.gz -C /opt && \
+    chown -R idp:idp /opt/jetty-distribution-$JETTY_VERSION && \
+    ln -snf /opt/jetty-distribution-$JETTY_VERSION/bin/jetty.sh /etc/init.d/jetty && \
+    echo "JETTY_HOME=/opt/jetty-distribution-$JETTY_VERSION/" > /etc/default/jetty && \
+    echo "JETTY_BASE=/opt/jetty" >> /etc/default/jetty && \
+    echo "JETTY_USER=idp" >> /etc/default/jetty && \
+    cd /opt/jetty && \
+    java -jar /opt/jetty-distribution-$JETTY_VERSION/start.jar --add-to-startd=http,https,logging,deploy,jsp,jstl,plus,servlets,annotations,ext,resources,logging,requestlog && \
+    mkdir -p /opt/jetty/webapps/root && \
+    echo etc/tweak-ssl.xml >> /opt/jetty/start.d/https.ini && \
+    chown -R idp:idp /opt/jetty/ /opt/jetty-distribution*/
+
+COPY jetty/idp.xml /opt/jetty/webapps
+COPY jetty/tweak-ssl.xml /opt/jetty/etc
+
+# Shibboleth IdP -- common steps
+RUN wget -q -P /opt/src/ https://shibboleth.net/downloads/identity-provider/$SHIBBOLETH_VERSION/shibboleth-identity-provider-$SHIBBOLETH_VERSION.tar.gz \
+                         https://shibboleth.net/downloads/identity-provider/$SHIBBOLETH_VERSION/shibboleth-identity-provider-$SHIBBOLETH_VERSION.tar.gz.asc \
+                         https://shibboleth.net/downloads/identity-provider/$SHIBBOLETH_VERSION/shibboleth-identity-provider-$SHIBBOLETH_VERSION.tar.gz.sha256 && \
+    cd /opt/src && sha256sum -c shibboleth-identity-provider-$SHIBBOLETH_VERSION.tar.gz.sha256 && \
+    gpg -q --keyserver pgp.mit.edu --recv-keys $SHIBBOLETH_KEY && \
+    gpg -q --verify /opt/src/shibboleth-identity-provider-$SHIBBOLETH_VERSION.tar.gz.asc && \
+    tar -xzf /opt/src/shibboleth-identity-provider-$SHIBBOLETH_VERSION.tar.gz -C /opt
+
+# Clean packages
+RUN apt-get -qq -y purge \
+    wget \
+    gnupg2 \
+    dirmngr && \
+    apt-get -qq -y autoremove
+
+# Clean source codes
+RUN rm -rf /opt/src
+
+CMD ["/bin/bash"]
+
