@@ -14,11 +14,12 @@ You just need to follow these steps:
 4. Execute `run.sh`.
 5. In case you would like to go into the container, execute `attach.sh`.
 6. To stop the container, execute `stop.sh`.
+7. Grab IdP's metadata (`https://your_machine_IP_address/idp/shibboleth`) and insert it into your (testing?) federation.
+8. Wait for metadata to propagate.
+9. Select a service from your (testing?) federation and try to log in using the newly installed IdP.
 
-To get Shibboleth IdP up and running. However, no configuration (LDAP etc.) is available at this moment.
-
-You can check that the IdP is running by accessing ports `8080` (*HTTP*) and `8443` (*HTTPS*). For example, to show IdP's metadata go to the following URL address:
-* `https://your_machine_IP_address:8443/idp/shibboleth`
+You can check that the IdP is running by accessing ports `80` (*HTTP*) and `443` (*HTTPS*). For example, to show IdP's metadata go to the following URL address:
+* `https://your_machine_IP_address/idp/shibboleth`
 
 Status of the IdP can be obtained using a shell. One just need to attach the running Docker container and check `idp-process.log` log file which should contain the following line:
 ```bash

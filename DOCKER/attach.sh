@@ -1,3 +1,6 @@
 #!/bin/bash
 
-docker container exec -it stretch-shib-idp-test01 /bin/bash
+source ./buildenv.conf
+
+docker container exec -it idp-$SHIBBOLETH_HOSTNAME /bin/bash
+
