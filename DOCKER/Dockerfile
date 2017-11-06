@@ -118,13 +118,16 @@ RUN echo idp.no.tidy=true>>/opt/idp.install.properties && \
         -Didp.noprompt=true
 
 # Shibboleth IdP -- copy host-specific configuration files
-COPY hosts/$SHIBBOLETH_HOSTNAME/attribute-filter.xml.test \
-     hosts/$SHIBBOLETH_HOSTNAME/attribute-resolver.xml.test \
-     hosts/$SHIBBOLETH_HOSTNAME/idp.properties.test \
-     hosts/$SHIBBOLETH_HOSTNAME/ldap.properties.test \
-     hosts/$SHIBBOLETH_HOSTNAME/metadata-providers.xml.test \
-     hosts/$SHIBBOLETH_HOSTNAME/relying-party.xml.test \
+COPY hosts/$SHIBBOLETH_HOSTNAME/attribute-filter.xml \
+     hosts/$SHIBBOLETH_HOSTNAME/attribute-resolver.xml \
+     hosts/$SHIBBOLETH_HOSTNAME/ldap.properties \
+     hosts/$SHIBBOLETH_HOSTNAME/metadata-providers.xml \
+     hosts/$SHIBBOLETH_HOSTNAME/relying-party.xml \
      /opt/shibboleth-idp/conf/
+
+COPY hosts/$SHIBBOLETH_HOSTNAME/ldap-server.crt \
+     hosts/$SHIBBOLETH_HOSTNAME/metadata.eduid.cz.crt.pem \
+     /opt/shibboleth-idp/credentials/
 
 EXPOSE 8080 8443
 
