@@ -67,13 +67,9 @@ COPY hosts/$SHIBBOLETH_HOSTNAME/ldap-server.crt \
      /opt/shibboleth-idp/credentials/
 
 RUN apt-get update && \
-    apt-get -qq -y install patch
-
-COPY hosts/$SHIBBOLETH_HOSTNAME/idp-metadata.patch \
-     /opt/shibboleth-idp/metadata/
-
-RUN cd /opt/shibboleth-idp/metadata && \
-    patch idp-metadata.xml idp-metadata.patch
+    apt-get -qq -y install \
+    vim \
+    less
 
 COPY hosts/$SHIBBOLETH_HOSTNAME/idp.properties \
      /opt/shibboleth-idp/conf/

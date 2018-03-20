@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 if [[ $1 == "tag" ]]; then
     TAG=`date +:%Y%m%d-%H%M%S`
