@@ -26,8 +26,15 @@ source ./hosts/$1/buildenv.conf
 
 echo "Using Docker Volume vol-${SHIBBOLETH_HOSTNAME}..."
 
-mkdir -p /var/tmp/docker-logs-jetty \
-         /var/tmp/docker-logs-shibboleth
+if [ "$(uname)" == "Darwin" ]; then
+    DOCKER_LOGS_JETTY=/tmp/docker-logs-jetty
+    DOCKER_LOGS_SHIBBOLETH=/tmp/docker-logs-shibboleth
+elif [ "$(uname)" == "Linux" ]; then
+    DOCKER_LOGS_JETTY=/var/tmp/docker-logs-jetty
+    DOCKER_LOGS_SHIBBOLETH=/var/tmp/docker-logs-shibboleth
+fi
+
+mkdir -p $DOCKER_LOGS_JETTY $DOCKER_LOGS_SHIBBOLETH
 
 docker container run \
     -it \
@@ -37,7 +44,7 @@ docker container run \
     --hostname idp-$SHIBBOLETH_HOSTNAME \
     -p $PORT_HTTP:8080 -p $PORT_HTTPS:8443 \
     --mount source=vol-$SHIBBOLETH_HOSTNAME,destination=/opt \
-    -v /var/tmp/docker-logs-jetty:/opt/jetty/logs \
-    -v /var/tmp/docker-logs/shibboleth:/opt/shibboleth-idp/logs \
+    -v $DOCKER_LOGS_JETTY:/opt/jetty/logs \
+    -v $DOCKER_LOGS_SHIBBOLETH:/opt/shibboleth-idp/logs \
     idp-$SHIBBOLETH_HOSTNAME
 
