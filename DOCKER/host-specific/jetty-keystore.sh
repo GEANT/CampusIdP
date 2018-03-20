@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # /tmp/key.pem              -- a private key
 # /tmp/cert.pem             -- a certificate with full chain
