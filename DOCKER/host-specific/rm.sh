@@ -7,5 +7,9 @@ fi
 
 source ./hosts/$1/buildenv.conf
 
+echo "Removing Docker image for ${SHIBBOLETH_HOSTNAME}..."
 docker image rm idp-$SHIBBOLETH_HOSTNAME
+
+echo "Removing Docker volume for ${SHIBBOLETH_HOSTNAME}..."
+docker volume rm vol-$SHIBBOLETH_HOSTNAME
 
