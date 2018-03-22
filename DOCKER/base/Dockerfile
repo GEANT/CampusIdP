@@ -48,6 +48,12 @@ RUN groupadd idp && \
     echo "JETTY_USER=idp" >> /etc/default/jetty && \
     cd /opt/jetty && \
     java -jar /opt/jetty-distribution-$JETTY_VERSION/start.jar --add-to-startd=http,https,logging,deploy,jsp,jstl,plus,servlets,annotations,ext,resources,logging,requestlog && \
+    wget -q -P /opt/jetty/lib/ext https://aaiwiki.cesnet.cz/idp_files/commons-dbcp2-2.1.1.jar \
+                                  https://aaiwiki.cesnet.cz/idp_files/commons-pool2-2.4.2.jar \
+                                  https://aaiwiki.cesnet.cz/idp_files/commons-logging-api-1.1.jar && \
+    wget -q -P /opt/src https://aaiwiki.cesnet.cz/idp_files/mysql-connector-java-5.1.39.tar.gz && \
+    tar -xzf /opt/src/mysql-connector-java-5.1.39.tar.gz -C /opt/src && \
+    cp /opt/src/mysql-connector-java-5.1.39/mysql-connector-java-5.1.39-bin.jar /opt/jetty/lib/ext && \
     mkdir -p /opt/jetty/webapps/root && \
     echo etc/tweak-ssl.xml >> /opt/jetty/start.d/https.ini && \
     chown -R idp:idp /opt/jetty/ /opt/jetty-distribution*/

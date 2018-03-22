@@ -42,6 +42,7 @@ docker container run \
     --detach \
     --name idp-$SHIBBOLETH_HOSTNAME \
     --hostname idp-$SHIBBOLETH_HOSTNAME \
+    --link mysql-$SHIBBOLETH_HOSTNAME:mysql \
     -p $PORT_HTTP:8080 -p $PORT_HTTPS:8443 \
     --mount source=vol-$SHIBBOLETH_HOSTNAME,destination=/opt \
     -v $DOCKER_LOGS_JETTY:/opt/jetty/logs \
