@@ -57,10 +57,20 @@ RUN echo idp.no.tidy=true>>/opt/idp.install.properties && \
 # Shibboleth IdP -- copy host-specific configuration files
 COPY hosts/$SHIBBOLETH_HOSTNAME/attribute-filter.xml \
      hosts/$SHIBBOLETH_HOSTNAME/attribute-resolver.xml \
+     hosts/$SHIBBOLETH_HOSTNAME/global.xml \
      hosts/$SHIBBOLETH_HOSTNAME/ldap.properties \
      hosts/$SHIBBOLETH_HOSTNAME/metadata-providers.xml \
      hosts/$SHIBBOLETH_HOSTNAME/relying-party.xml \
+     hosts/$SHIBBOLETH_HOSTNAME/saml-nameid.properties \
+     hosts/$SHIBBOLETH_HOSTNAME/saml-nameid.xml \
      /opt/shibboleth-idp/conf/
+
+# Shibboleth IdP -- Persistent ID aka eduPersonTargetedID
+RUN apt-get update && apt-get -qq --no-install-recommends install wget expect
+RUN sed -i.bak 's%<!-- <ref bean="c14n/SAML2Persistent" /> -->%<ref bean="c14n/SAML2Persistent" />%' /opt/shibboleth-idp/conf/c14n/subject-c14n.xml
+RUN wget -q -P /opt/shibboleth-idp/edit-webapp/WEB-INF/lib https://aaiwiki.cesnet.cz/idp_files/jstl-1.2.jar
+COPY shibboleth-rebuild.expect /opt
+RUN cd /opt/shibboleth-idp && ../shibboleth-rebuild.expect
 
 COPY hosts/$SHIBBOLETH_HOSTNAME/ldap-server.crt \
      hosts/$SHIBBOLETH_HOSTNAME/metadata.eduid.cz.crt.pem \
