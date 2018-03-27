@@ -23,6 +23,7 @@ ENV SHIBBOLETH_VERSION=$SHIBBOLETH_VERSION \
 RUN apt-get -qq update && \
     apt-get -qq -y --no-install-recommends install \
     wget \
+    expect \
     openjdk-8-jre-headless \
     gnupg2 \
     dirmngr && \
@@ -72,7 +73,6 @@ RUN wget -q -P /opt/src/ https://shibboleth.net/downloads/identity-provider/$SHI
 
 # Clean packages
 RUN apt-get -qq -y purge \
-    wget \
     gnupg2 \
     dirmngr && \
     apt-get -qq -y autoremove
