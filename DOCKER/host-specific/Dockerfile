@@ -75,11 +75,6 @@ COPY hosts/$SHIBBOLETH_HOSTNAME/ldap-server.crt \
      hosts/$SHIBBOLETH_HOSTNAME/metadata.eduid.cz.crt.pem \
      /opt/shibboleth-idp/credentials/
 
-RUN apt-get update && \
-    apt-get -qq -y install \
-    vim \
-    less
-
 COPY hosts/$SHIBBOLETH_HOSTNAME/idp.properties \
      /opt/shibboleth-idp/conf/
 
