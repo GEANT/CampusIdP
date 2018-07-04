@@ -2,7 +2,7 @@
 
 This directory contains a `Dockerfile` for building a base image to run Shibboleth IdP on top of Jetty and OpenJDK 8.
 
-You can specify Jetty and Shibboleth IdP versions (as well as the GPG keys used to sign the source codes) in `buildenv.conf` file using `JETTY_VERSION`, `JETTY_KEY`, `SHIBBOLETH_VERSION` and `SHIBBOLETH_KEY` variables. Although all the variables are set, you might like to check them in order a newer version is available.
+You can specify Jetty and Shibboleth IdP versions in `buildenv.conf` file using `JETTY_VERSION` and `SHIBBOLETH_VERSION` variables. Although all the variables are set, you might like to check them in order a newer version is available. There used to be `JETTY_KEY` and `SHIBBOLETH_KEY` variables containing developers' GPG keys, however, since GPG servers seem to be unreliable, you have to import GPG keys within Dockerfile, sorry.
 
 There's also `jetty/` directory containing two configuration files for Jetty, which you might like to check if they fit to your needs. They should.
 
