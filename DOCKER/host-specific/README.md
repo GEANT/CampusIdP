@@ -4,7 +4,7 @@ This directory contains (almost) everything you need to build your own Shibbolet
 
 You'll need the following:
 
-1. Working Docker environment. The official latest version required -- 17.09.0-ce.
+1. Working Docker environment. The official latest version required.
 2. A certificate with the full chain in `hosts/$FQDN/cert.pem` file.
 3. A private key in `hosts/$FQDN/key.pem` file.
 
