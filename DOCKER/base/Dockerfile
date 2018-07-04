@@ -31,6 +31,12 @@ RUN apt-get -qq update && \
     dirmngr && \
     rm -rf /var/lib/apt/lists/*
 
+# import GPG keys
+COPY joakim.erdfelt_gmail.com.key /root
+COPY tzeller_dragonacea.biz.key /root
+RUN gpg -q --import /root/joakim.erdfelt_gmail.com.key && \
+    gpg -q --import /root/tzeller_dragonacea.biz.key
+
 # Jetty -- common steps
 RUN groupadd idp && \
     useradd -m -g idp -s /bin/bash idp && \
@@ -38,10 +44,8 @@ RUN groupadd idp && \
     chown idp:idp /opt/src /opt/jetty && \
     wget -q -P /opt/src http://central.maven.org/maven2/org/eclipse/jetty/jetty-distribution/$JETTY_VERSION/jetty-distribution-$JETTY_VERSION.tar.gz \
                         http://central.maven.org/maven2/org/eclipse/jetty/jetty-distribution/$JETTY_VERSION/jetty-distribution-$JETTY_VERSION.tar.gz.sha1 \
-                        http://central.maven.org/maven2/org/eclipse/jetty/jetty-distribution/$JETTY_VERSION/jetty-distribution-$JETTY_VERSION.tar.gz.asc \
-                        http://central.maven.org/maven2/org/eclipse/jetty/jetty-distribution/$JETTY_VERSION/jetty-distribution-$JETTY_VERSION.tar.gz.asc.sha1 && \
+                        http://central.maven.org/maven2/org/eclipse/jetty/jetty-distribution/$JETTY_VERSION/jetty-distribution-$JETTY_VERSION.tar.gz.asc && \
     echo `cat /opt/src/jetty-distribution-$JETTY_VERSION.tar.gz.sha1` /opt/src/jetty-distribution-$JETTY_VERSION.tar.gz | sha1sum -c && \
-    gpg -q --keyserver pgp.mit.edu --recv-keys $JETTY_KEY && \
     gpg -q --verify /opt/src/jetty-distribution-$JETTY_VERSION.tar.gz.asc && \
     tar -xzf /opt/src/jetty-distribution-$JETTY_VERSION.tar.gz -C /opt && \
     chown -R idp:idp /opt/jetty-distribution-$JETTY_VERSION && \
@@ -69,7 +73,6 @@ RUN wget -q -P /opt/src/ https://shibboleth.net/downloads/identity-provider/$SHI
                          https://shibboleth.net/downloads/identity-provider/$SHIBBOLETH_VERSION/shibboleth-identity-provider-$SHIBBOLETH_VERSION.tar.gz.asc \
                          https://shibboleth.net/downloads/identity-provider/$SHIBBOLETH_VERSION/shibboleth-identity-provider-$SHIBBOLETH_VERSION.tar.gz.sha256 && \
     cd /opt/src && sha256sum -c shibboleth-identity-provider-$SHIBBOLETH_VERSION.tar.gz.sha256 && \
-    gpg -q --keyserver pgp.mit.edu --recv-keys $SHIBBOLETH_KEY && \
     gpg -q --verify /opt/src/shibboleth-identity-provider-$SHIBBOLETH_VERSION.tar.gz.asc && \
     tar -xzf /opt/src/shibboleth-identity-provider-$SHIBBOLETH_VERSION.tar.gz -C /opt
 
