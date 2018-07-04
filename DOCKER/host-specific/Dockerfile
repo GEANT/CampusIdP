@@ -61,7 +61,6 @@ COPY hosts/$SHIBBOLETH_HOSTNAME/attribute-filter.xml \
      hosts/$SHIBBOLETH_HOSTNAME/idp.properties \
      hosts/$SHIBBOLETH_HOSTNAME/ldap.properties \
      hosts/$SHIBBOLETH_HOSTNAME/metadata-providers.xml \
-     hosts/$SHIBBOLETH_HOSTNAME/relying-party.xml \
      hosts/$SHIBBOLETH_HOSTNAME/saml-nameid.properties \
      hosts/$SHIBBOLETH_HOSTNAME/saml-nameid.xml \
      /opt/shibboleth-idp/conf/
