@@ -61,7 +61,6 @@ COPY hosts/$SHIBBOLETH_HOSTNAME/attribute-filter.xml \
      hosts/$SHIBBOLETH_HOSTNAME/idp.properties \
      hosts/$SHIBBOLETH_HOSTNAME/ldap.properties \
      hosts/$SHIBBOLETH_HOSTNAME/metadata-providers.xml \
-     hosts/$SHIBBOLETH_HOSTNAME/relying-party.xml \
      hosts/$SHIBBOLETH_HOSTNAME/saml-nameid.properties \
      hosts/$SHIBBOLETH_HOSTNAME/saml-nameid.xml \
      /opt/shibboleth-idp/conf/
@@ -74,7 +73,6 @@ COPY hosts/$SHIBBOLETH_HOSTNAME/idp-encryption.??? \
 
 # Shibboleth IdP -- Persistent ID aka eduPersonTargetedID
 RUN sed -i.bak 's%<!-- <ref bean="c14n/SAML2Persistent" /> -->%<ref bean="c14n/SAML2Persistent" />%' /opt/shibboleth-idp/conf/c14n/subject-c14n.xml
-RUN wget -q -P /opt/shibboleth-idp/edit-webapp/WEB-INF/lib https://aaiwiki.cesnet.cz/idp_files/jstl-1.2.jar
 COPY shibboleth-rebuild.expect /opt
 RUN cd /opt/shibboleth-idp && ../shibboleth-rebuild.expect
 
