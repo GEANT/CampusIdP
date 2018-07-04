@@ -10,7 +10,7 @@ There's also `jetty/` directory containing two configuration files for Jetty, wh
 
 Simply run `./build.sh` to build this base Docker image.
 
-You can start the image after it's built using `./run.sh` command, however, it doesn't contain nothing important. This script is there just for debugging purposes as well as `./attach.sh` and `./stop.sh`.
+You can start the image after it's built using `./run.sh` command, however, it doesn't contain anything important. This script is there just for debugging purposes as well as `./attach.sh` and `./stop.sh`.
 
 To delete the image built using `./build.sh`, you can use `./rm.sh` script.
 
