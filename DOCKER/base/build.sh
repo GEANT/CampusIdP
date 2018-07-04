@@ -13,8 +13,6 @@ source ./buildenv.conf
 docker image build \
     --build-arg JAVA_HOME=$JAVA_HOME \
     --build-arg JETTY_VERSION=$JETTY_VERSION \
-    --build-arg JETTY_KEY=$JETTY_KEY \
     --build-arg SHIBBOLETH_VERSION=$SHIBBOLETH_VERSION \
-    --build-arg SHIBBOLETH_KEY=$SHIBBOLETH_KEY \
     -t shibboleth-idp$TAG .
 
