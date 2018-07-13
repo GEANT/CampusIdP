@@ -34,8 +34,8 @@ ENV SHIBBOLETH_SCOPE=$SHIBBOLETH_SCOPE \
 
 # Jetty -- container dependent steps
 COPY jetty-keystore.sh hosts/$SHIBBOLETH_HOSTNAME/key.pem hosts/$SHIBBOLETH_HOSTNAME/cert.pem /tmp/
-RUN echo $SHIBBOLETH_ENTITYID >> /opt/jetty/webapps/root/index.html && \
-    /tmp/jetty-keystore.sh $JETTY_VERSION $PASSWORD_CERT_KEY $PASSWORD_PKCS12 $PASSWORD_KEYSTORE $SHIBBOLETH_HOSTNAME
+COPY index_header.html index_footer.html index.sh /tmp/
+RUN /tmp/jetty-keystore.sh $JETTY_VERSION $PASSWORD_CERT_KEY $PASSWORD_PKCS12 $PASSWORD_KEYSTORE $SHIBBOLETH_HOSTNAME
 
 # Shibboleth IdP -- container dependent steps
 RUN echo idp.no.tidy=true>>/opt/idp.install.properties && \
@@ -75,6 +75,9 @@ COPY hosts/$SHIBBOLETH_HOSTNAME/idp-encryption.??? \
 RUN sed -i.bak 's%<!-- <ref bean="c14n/SAML2Persistent" /> -->%<ref bean="c14n/SAML2Persistent" />%' /opt/shibboleth-idp/conf/c14n/subject-c14n.xml
 COPY shibboleth-rebuild.expect /opt
 RUN cd /opt/shibboleth-idp && ../shibboleth-rebuild.expect
+
+# IdP information page
+RUN /tmp/index.sh
 
 EXPOSE 8080 8443
 
