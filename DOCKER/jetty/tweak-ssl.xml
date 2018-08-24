@@ -3,7 +3,7 @@
  
 <Configure id="sslContextFactory" class="org.eclipse.jetty.util.ssl.SslContextFactory">
 
-  <!-- Zakázání starých a nedůvěryhodných šifer -->
+  <!-- Exclude untrustworthy ciphers -->
   <Call name="addExcludeCipherSuites">
     <Arg>
       <Array type="String">
@@ -21,7 +21,7 @@
     </Arg>
   </Call>
 
-  <!-- Zakázání nedůvěryhodných protokolů -->
+  <!-- Exclude untrustworthy protocols -->
   <Call name="addExcludeProtocols">
     <Arg>
      <Array type="java.lang.String">
@@ -33,7 +33,7 @@
     </Arg>
   </Call>
 
-  <!-- Povolení Forward Secrecy -->
+  <!-- Include Forward Secrecy -->
   <Set name="IncludeCipherSuites">
     <Array type="String">
       <Item>TLS_DHE_RSA.*</Item>

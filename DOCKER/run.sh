@@ -22,7 +22,7 @@ else
     echo "Using port ${PORT_HTTPS} for HTTPS."
 fi
 
-source ./hosts/$1/buildenv.conf
+source ./env/$1.conf
 
 echo "Using Docker Volume vol-${SHIBBOLETH_HOSTNAME}..."
 

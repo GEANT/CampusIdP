@@ -5,7 +5,7 @@ if [[ -z $1 ]]; then
     exit
 fi
 
-source ./hosts/$1/buildenv.conf
+source ./env/$1.conf
 
 echo "Removing Docker image for ${SHIBBOLETH_HOSTNAME}..."
 docker image rm idp-$SHIBBOLETH_HOSTNAME

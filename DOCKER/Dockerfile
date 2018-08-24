@@ -20,18 +20,15 @@ RUN apt-get -qq update && \
     apt-get -qq -y --no-install-recommends install \
     wget \
     expect \
-    vim \
-    less \
     openjdk-8-jre-headless \
     gnupg2 \
     dirmngr && \
     rm -rf /var/lib/apt/lists/*
 
 # import GPG keys
-COPY joakim.erdfelt_gmail.com.key /root
-COPY tzeller_dragonacea.biz.key /root
-RUN gpg -q --import /root/joakim.erdfelt_gmail.com.key && \
-    gpg -q --import /root/tzeller_dragonacea.biz.key
+COPY gpg/ /root/gpg/
+RUN gpg -q --import /root/gpg/joakim.erdfelt_gmail.com.key && \
+    gpg -q --import /root/gpg/tzeller_dragonacea.biz.key
 
 # Jetty -- common steps
 RUN groupadd idp && \
@@ -81,5 +78,98 @@ RUN apt-get -qq -y purge \
 # Clean source codes
 RUN rm -rf /opt/src
 
-CMD ["/bin/bash"]
+#CMD ["/bin/bash"]
+
+# Common variables
+## Jetty
+ARG JETTY_VERSION
+ENV JETTY_VERSION=$JETTY_VERSION
+
+## Shibboleth IdP
+ARG SHIBBOLETH_VERSION
+ENV SHIBBOLETH_VERSION=$SHIBBOLETH_VERSION
+
+# Container dependent variables
+## Jetty
+ARG PASSWORD_CERT_KEY
+ARG PASSWORD_PKCS12
+ARG PASSWORD_KEYSTORE
+ENV PASSWORD_CERT_KEY=$PASSWORD_CERT_KEY \
+    PASSWORD_PKCS12=$PASSWORD_PKCS12 \
+    PASSWORD_KEYSTORE=$PASSWORD_KEYSTORE
+
+## Shibboleth IdP
+ARG SHIBBOLETH_SCOPE
+ARG SHIBBOLETH_ENTITYID
+ARG SHIBBOLETH_HOSTNAME
+ARG SHIBBOLETH_PASSWORD_SEALER
+ARG SHIBBOLETH_PASSWORD_KEYSTORE
+ENV SHIBBOLETH_SCOPE=$SHIBBOLETH_SCOPE \
+    SHIBBOLETH_ENTITYID=$SHIBBOLETH_ENTITYID \
+    SHIBBOLETH_HOSTNAME=$SHIBBOLETH_HOSTNAME \
+    SHIBBOLETH_PASSWORD_SEALER=$SHIBBOLETH_PASSWORD_SEALER \
+    SHIBBOLETH_PASSWORD_KEYSTORE=$SHIBBOLETH_PASSWORD_KEYSTORE
+
+# Jetty -- container dependent steps
+COPY scripts/jetty-keystore.sh conf/$SHIBBOLETH_HOSTNAME/key.pem conf/$SHIBBOLETH_HOSTNAME/cert.pem /tmp/
+COPY web/* /tmp/
+RUN /tmp/jetty-keystore.sh $JETTY_VERSION $PASSWORD_CERT_KEY $PASSWORD_PKCS12 $PASSWORD_KEYSTORE $SHIBBOLETH_HOSTNAME
+
+# Shibboleth IdP -- container dependent steps
+RUN echo idp.no.tidy=true>>/opt/idp.install.properties && \
+    echo idp.scope=$SHIBBOLETH_SCOPE>>/opt/idp.merge.properties && \
+    echo idp.entityID=$SHIBBOLETH_ENTITYID>>/opt/idp.merge.properties && \
+    echo idp.sealer.storePassword=$SHIBBOLETH_PASSWORD_SEALER>>/opt/idp.merge.properties && \
+    echo idp.sealer.keyPassword=$SHIBBOLETH_PASSWORD_SEALER>>/opt/idp.merge.properties && \
+    /opt/shibboleth-identity-provider-$SHIBBOLETH_VERSION/bin/install.sh \
+        -Didp.property.file=/opt/idp.install.properties \
+        -Didp.merge.properties=/opt/idp.merge.properties \
+        -Didp.src.dir=/opt/shibboleth-identity-provider-$SHIBBOLETH_VERSION \
+        -Didp.target.dir=/opt/shibboleth-idp \
+        -Didp.scope=$SHIBBOLETH_SCOPE \
+        -Didp.host.name=$SHIBBOLETH_HOSTNAME \
+        -Didp.sealer.password=$SHIBBOLETH_PASSWORD_SEALER \
+        -Didp.keystore.password=$SHIBBOLETH_PASSWORD_KEYSTORE \
+        -Didp.noprompt=true
+
+# Shibboleth IdP -- copy host-specific configuration files
+COPY conf/$SHIBBOLETH_HOSTNAME/attribute-filter.xml \
+     conf/$SHIBBOLETH_HOSTNAME/attribute-resolver.xml \
+     conf/$SHIBBOLETH_HOSTNAME/global.xml \
+     conf/$SHIBBOLETH_HOSTNAME/idp.properties \
+     conf/$SHIBBOLETH_HOSTNAME/ldap.properties \
+     conf/$SHIBBOLETH_HOSTNAME/metadata-providers.xml \
+     conf/$SHIBBOLETH_HOSTNAME/saml-nameid.properties \
+     conf/$SHIBBOLETH_HOSTNAME/saml-nameid.xml \
+     /opt/shibboleth-idp/conf/
+
+COPY conf/$SHIBBOLETH_HOSTNAME/idp-encryption.??? \
+     conf/$SHIBBOLETH_HOSTNAME/idp-signing.??? \
+     conf/$SHIBBOLETH_HOSTNAME/ldap-server.crt \
+     conf/$SHIBBOLETH_HOSTNAME/metadata.eduid.cz.crt.pem \
+     /opt/shibboleth-idp/credentials/
+
+# Shibboleth IdP -- Persistent ID aka eduPersonTargetedID
+RUN sed -i.bak 's%<!-- <ref bean="c14n/SAML2Persistent" /> -->%<ref bean="c14n/SAML2Persistent" />%' /opt/shibboleth-idp/conf/c14n/subject-c14n.xml
+COPY scripts/shibboleth-rebuild.expect /opt
+RUN cd /opt/shibboleth-idp && ../shibboleth-rebuild.expect
+
+# IdP information page
+RUN /tmp/index.sh
+
+EXPOSE 8080 8443
+
+#CMD ["/bin/bash"]
+
+CMD ["sh", "-c", "java \
+    -Djetty.logging.dir=/opt/jetty/logs \
+    -Djetty.home=/opt/jetty-distribution-$JETTY_VERSION \
+    -Djetty.base=/opt/jetty \
+    -Djava.io.tmpdir=/tmp \
+    -jar \
+    /opt/jetty-distribution-$JETTY_VERSION/start.jar \
+    jetty.state=/opt/jetty/jetty.state \
+    jetty-logging.xml \
+    jetty-started.xml \
+    start-log-file=/opt/jetty/logs/start.log"]
 

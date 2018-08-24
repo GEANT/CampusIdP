@@ -5,9 +5,19 @@ if [[ -z $1 ]]; then
     exit
 fi
 
-source ./hosts/$1/buildenv.conf
+if [[ $2 == "tag" ]]; then
+    TAG=`date +:%Y%m%d-%H%M%S`
+elif [[ -n $2 ]]; then
+    TAG=":$2"
+else
+    TAG=":latest"
+fi
+
+source env/base.conf
+source env/$1.conf
 
 docker image build \
+    --build-arg JAVA_HOME=$JAVA_HOME \
     --build-arg JETTY_VERSION=$JETTY_VERSION \
     --build-arg PASSWORD_CERT_KEY=$PASSWORD_CERT_KEY \
     --build-arg PASSWORD_PKCS12=$PASSWORD_PKCS12 \
