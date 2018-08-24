@@ -111,7 +111,7 @@ ENV SHIBBOLETH_SCOPE=$SHIBBOLETH_SCOPE \
     SHIBBOLETH_PASSWORD_KEYSTORE=$SHIBBOLETH_PASSWORD_KEYSTORE
 
 # Jetty -- container dependent steps
-COPY jetty-keystore.sh conf/$SHIBBOLETH_HOSTNAME/key.pem conf/$SHIBBOLETH_HOSTNAME/cert.pem /tmp/
+COPY scripts/jetty-keystore.sh conf/$SHIBBOLETH_HOSTNAME/key.pem conf/$SHIBBOLETH_HOSTNAME/cert.pem /tmp/
 COPY web/* /tmp/
 RUN /tmp/jetty-keystore.sh $JETTY_VERSION $PASSWORD_CERT_KEY $PASSWORD_PKCS12 $PASSWORD_KEYSTORE $SHIBBOLETH_HOSTNAME
 
@@ -151,7 +151,7 @@ COPY conf/$SHIBBOLETH_HOSTNAME/idp-encryption.??? \
 
 # Shibboleth IdP -- Persistent ID aka eduPersonTargetedID
 RUN sed -i.bak 's%<!-- <ref bean="c14n/SAML2Persistent" /> -->%<ref bean="c14n/SAML2Persistent" />%' /opt/shibboleth-idp/conf/c14n/subject-c14n.xml
-COPY shibboleth-rebuild.expect /opt
+COPY scripts/shibboleth-rebuild.expect /opt
 RUN cd /opt/shibboleth-idp && ../shibboleth-rebuild.expect
 
 # IdP information page
