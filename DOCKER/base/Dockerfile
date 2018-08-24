@@ -28,10 +28,9 @@ RUN apt-get -qq update && \
     rm -rf /var/lib/apt/lists/*
 
 # import GPG keys
-COPY joakim.erdfelt_gmail.com.key /root
-COPY tzeller_dragonacea.biz.key /root
-RUN gpg -q --import /root/joakim.erdfelt_gmail.com.key && \
-    gpg -q --import /root/tzeller_dragonacea.biz.key
+COPY gpg/ /root/gpg/
+RUN gpg -q --import /root/gpg/joakim.erdfelt_gmail.com.key && \
+    gpg -q --import /root/gpg/tzeller_dragonacea.biz.key
 
 # Jetty -- common steps
 RUN groupadd idp && \
