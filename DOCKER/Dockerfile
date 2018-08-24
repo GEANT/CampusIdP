@@ -78,8 +78,6 @@ RUN apt-get -qq -y purge \
 # Clean source codes
 RUN rm -rf /opt/src
 
-#CMD ["/bin/bash"]
-
 # Common variables
 ## Jetty
 ARG JETTY_VERSION
@@ -158,8 +156,6 @@ RUN cd /opt/shibboleth-idp && ../shibboleth-rebuild.expect
 RUN /tmp/index.sh
 
 EXPOSE 8080 8443
-
-#CMD ["/bin/bash"]
 
 CMD ["sh", "-c", "java \
     -Djetty.logging.dir=/opt/jetty/logs \
