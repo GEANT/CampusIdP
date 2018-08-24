@@ -5,7 +5,7 @@ if [[ -z $1 ]]; then
     exit
 fi
 
-source ./hosts/$1/buildenv.conf
+source ./env/$1.conf
 
 docker container run \
     -it \
