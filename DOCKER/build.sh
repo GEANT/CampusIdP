@@ -13,8 +13,8 @@ else
     TAG=":latest"
 fi
 
-source env/base.conf
-source env/$1.conf
+source ./conf/base.conf
+source ./conf/$1.conf
 
 docker image build \
     --build-arg JAVA_HOME=$JAVA_HOME \

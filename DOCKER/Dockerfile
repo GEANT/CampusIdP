@@ -18,6 +18,8 @@ ENV SHIBBOLETH_VERSION=$SHIBBOLETH_VERSION
 # update APT cache and install required packages
 RUN apt-get -qq update && \
     apt-get -qq -y --no-install-recommends install \
+    vim \
+    less \
     wget \
     expect \
     openjdk-8-jre-headless \
@@ -77,8 +79,6 @@ RUN apt-get -qq -y purge \
 
 # Clean source codes
 RUN rm -rf /opt/src
-
-#CMD ["/bin/bash"]
 
 # Common variables
 ## Jetty
@@ -157,9 +157,7 @@ RUN cd /opt/shibboleth-idp && ../shibboleth-rebuild.expect
 # IdP information page
 RUN /tmp/index.sh
 
-EXPOSE 8080 8443
-
-#CMD ["/bin/bash"]
+EXPOSE 80 443
 
 CMD ["sh", "-c", "java \
     -Djetty.logging.dir=/opt/jetty/logs \

@@ -5,7 +5,7 @@ if [[ -z $1 ]]; then
     exit
 fi
 
-source ./env/$1.conf
+source ./conf/$1.conf
 
 docker container run \
     -it \
@@ -17,7 +17,7 @@ docker container run \
     -e MYSQL_DATABASE=$MYSQL_DATABASE \
     -e MYSQL_USER=$MYSQL_USER \
     -e MYSQL_PASSWORD=$MYSQL_PASSWORD \
-    -v `pwd`/mysql:/docker-entrypoint-initdb.d \
+    -v `pwd`/mysql/db:/docker-entrypoint-initdb.d \
     mysql:5 \
     --character-set-server=utf8mb4 \
     --collation-server=utf8mb4_unicode_ci \
