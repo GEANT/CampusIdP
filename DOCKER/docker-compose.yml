@@ -17,6 +17,8 @@ services:
         SHIBBOLETH_PASSWORD_KEYSTORE: ${SHIBBOLETH_PASSWORD_KEYSTORE}
     image: shibboleth-idp
     hostname: shibboleth-idp
+    volumes:
+      - idp-data:/opt
     ports:
       - 80:8080
       - 443:8443
@@ -28,8 +30,13 @@ services:
     volumes:
       - ./mysql/db:/docker-entrypoint-initdb.d
       - ./mysql/conf:/etc/mysql/conf.d
+      - mysql-data:/var/lib/mysql
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+
+volumes:
+  idp-data:
+  mysql-data:
