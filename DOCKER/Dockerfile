@@ -18,6 +18,8 @@ ENV SHIBBOLETH_VERSION=$SHIBBOLETH_VERSION
 # update APT cache and install required packages
 RUN apt-get -qq update && \
     apt-get -qq -y --no-install-recommends install \
+    vim \
+    less \
     wget \
     expect \
     openjdk-8-jre-headless \
