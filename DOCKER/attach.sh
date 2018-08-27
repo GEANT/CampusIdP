@@ -5,7 +5,7 @@ if [[ -z $1 ]]; then
     exit
 fi
 
-source ./env/$1.conf
+source ./conf/$1.conf
 
 docker container exec -it idp-$SHIBBOLETH_HOSTNAME /bin/bash
 
