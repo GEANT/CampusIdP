@@ -60,8 +60,8 @@ RUN groupadd idp && \
     echo etc/tweak-ssl.xml >> /opt/jetty/start.d/https.ini && \
     chown -R idp:idp /opt/jetty/ /opt/jetty-distribution*/
 
-COPY jetty/idp.xml /opt/jetty/webapps
-COPY jetty/tweak-ssl.xml /opt/jetty/etc
+COPY conf/common/jetty/idp.xml /opt/jetty/webapps
+COPY conf/common/jetty/tweak-ssl.xml /opt/jetty/etc
 
 # Shibboleth IdP -- common steps
 RUN wget -q -P /opt/src/ https://shibboleth.net/downloads/identity-provider/$SHIBBOLETH_VERSION/shibboleth-identity-provider-$SHIBBOLETH_VERSION.tar.gz \
