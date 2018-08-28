@@ -111,7 +111,7 @@ ENV SHIBBOLETH_SCOPE=$SHIBBOLETH_SCOPE \
     SHIBBOLETH_PASSWORD_KEYSTORE=$SHIBBOLETH_PASSWORD_KEYSTORE
 
 # Jetty -- container dependent steps
-COPY conf/common/scripts/jetty-keystore.sh conf/$SHIBBOLETH_HOSTNAME/key.pem conf/$SHIBBOLETH_HOSTNAME/cert.pem /tmp/
+COPY conf/common/scripts/jetty-keystore.sh conf/$SHIBBOLETH_HOSTNAME/jetty/key.pem conf/$SHIBBOLETH_HOSTNAME/jetty/cert.pem /tmp/
 COPY conf/common/web/* /tmp/
 RUN /tmp/jetty-keystore.sh $JETTY_VERSION $JETTY_CERT_KEY $JETTY_CERT_PKCS12 $JETTY_CERT_KEYSTORE $SHIBBOLETH_HOSTNAME
 
