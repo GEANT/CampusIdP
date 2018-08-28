@@ -1,6 +1,6 @@
 version: '3.6'
 services:
-  shibboleth-idp:
+  idp:
     build:
       context: .
       args:
@@ -23,14 +23,14 @@ services:
       - 9080:8080
       - 9443:8443
     depends_on:
-      - mysql
-  mysql:
+      - db
+  db:
     image: mysql:5
     hostname: mysql
     volumes:
       - ./mysql/db:/docker-entrypoint-initdb.d
       - ./mysql/conf:/etc/mysql/conf.d
-      - mysql-data:/var/lib/mysql
+      - db-data:/var/lib/mysql
     environment:
       MYSQL_ROOT_PASSWORD:
       MYSQL_DATABASE:
@@ -39,4 +39,4 @@ services:
 
 volumes:
   idp-data:
-  mysql-data:
+  db-data:
