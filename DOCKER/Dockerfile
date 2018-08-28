@@ -80,15 +80,6 @@ RUN apt-get -qq -y purge \
 # Clean source codes
 RUN rm -rf /opt/src
 
-# Common variables
-## Jetty
-ARG JETTY_VERSION
-ENV JETTY_VERSION=$JETTY_VERSION
-
-## Shibboleth IdP
-ARG SHIBBOLETH_VERSION
-ENV SHIBBOLETH_VERSION=$SHIBBOLETH_VERSION
-
 # Container dependent variables
 ## Jetty
 ARG JETTY_CERT_KEY
