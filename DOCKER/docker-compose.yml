@@ -20,8 +20,8 @@ services:
     volumes:
       - idp-data:/opt
     ports:
-      - 80:8080
-      - 443:8443
+      - 9080:8080
+      - 9443:8443
     depends_on:
       - mysql
   mysql:
