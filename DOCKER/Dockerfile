@@ -71,15 +71,6 @@ RUN wget -q -P /opt/src/ https://shibboleth.net/downloads/identity-provider/$SHI
     gpg -q --verify /opt/src/shibboleth-identity-provider-$SHIBBOLETH_VERSION.tar.gz.asc && \
     tar -xzf /opt/src/shibboleth-identity-provider-$SHIBBOLETH_VERSION.tar.gz -C /opt
 
-# Clean packages
-RUN apt-get -qq -y purge \
-    gnupg2 \
-    dirmngr && \
-    apt-get -qq -y autoremove
-
-# Clean source codes
-RUN rm -rf /opt/src
-
 # Container dependent variables
 ## Jetty
 ARG JETTY_CERT_KEY
