@@ -1,4 +1,4 @@
-# Create `shibboleth` database with `shibpid` table
+# Create `shibboleth` database with `shibpid` and `StorageRecords` tables
 
 SET NAMES 'utf8';
 SET CHARACTER SET utf8;
@@ -16,4 +16,11 @@ CREATE TABLE IF NOT EXISTS `shibpid` (
   `deactivationDate` TIMESTAMP NULL DEFAULT NULL,
   PRIMARY KEY (localEntity, peerEntity, persistentId)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
+CREATE TABLE IF NOT EXISTS `StorageRecords` (
+  `context` VARCHAR(255) NOT NULL,
+  `id` VARCHAR(255) NOT NULL,
+  `expires` BIGINT(20) DEFAULT NULL,
+  `value` LONGTEXT NOT NULL,
+  `version` BIGINT(20) NOT NULL,
+  PRIMARY KEY (context, id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
