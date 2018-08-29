@@ -60,8 +60,8 @@ RUN groupadd idp && \
     echo etc/tweak-ssl.xml >> /opt/jetty/start.d/https.ini && \
     chown -R idp:idp /opt/jetty/ /opt/jetty-distribution*/
 
-COPY jetty/idp.xml /opt/jetty/webapps
-COPY jetty/tweak-ssl.xml /opt/jetty/etc
+COPY conf/common/jetty/idp.xml /opt/jetty/webapps
+COPY conf/common/jetty/tweak-ssl.xml /opt/jetty/etc
 
 # Shibboleth IdP -- common steps
 RUN wget -q -P /opt/src/ https://shibboleth.net/downloads/identity-provider/$SHIBBOLETH_VERSION/shibboleth-identity-provider-$SHIBBOLETH_VERSION.tar.gz \
@@ -71,32 +71,14 @@ RUN wget -q -P /opt/src/ https://shibboleth.net/downloads/identity-provider/$SHI
     gpg -q --verify /opt/src/shibboleth-identity-provider-$SHIBBOLETH_VERSION.tar.gz.asc && \
     tar -xzf /opt/src/shibboleth-identity-provider-$SHIBBOLETH_VERSION.tar.gz -C /opt
 
-# Clean packages
-RUN apt-get -qq -y purge \
-    gnupg2 \
-    dirmngr && \
-    apt-get -qq -y autoremove
-
-# Clean source codes
-RUN rm -rf /opt/src
-
-# Common variables
-## Jetty
-ARG JETTY_VERSION
-ENV JETTY_VERSION=$JETTY_VERSION
-
-## Shibboleth IdP
-ARG SHIBBOLETH_VERSION
-ENV SHIBBOLETH_VERSION=$SHIBBOLETH_VERSION
-
 # Container dependent variables
 ## Jetty
-ARG PASSWORD_CERT_KEY
-ARG PASSWORD_PKCS12
-ARG PASSWORD_KEYSTORE
-ENV PASSWORD_CERT_KEY=$PASSWORD_CERT_KEY \
-    PASSWORD_PKCS12=$PASSWORD_PKCS12 \
-    PASSWORD_KEYSTORE=$PASSWORD_KEYSTORE
+ARG JETTY_CERT_KEY
+ARG JETTY_CERT_PKCS12
+ARG JETTY_CERT_KEYSTORE
+ENV JETTY_CERT_KEY=$JETTY_CERT_KEY \
+    JETTY_CERT_PKCS12=$JETTY_CERT_PKCS12 \
+    JETTY_CERT_KEYSTORE=$JETTY_CERT_KEYSTORE
 
 ## Shibboleth IdP
 ARG SHIBBOLETH_SCOPE
@@ -111,9 +93,9 @@ ENV SHIBBOLETH_SCOPE=$SHIBBOLETH_SCOPE \
     SHIBBOLETH_PASSWORD_KEYSTORE=$SHIBBOLETH_PASSWORD_KEYSTORE
 
 # Jetty -- container dependent steps
-COPY scripts/jetty-keystore.sh conf/$SHIBBOLETH_HOSTNAME/key.pem conf/$SHIBBOLETH_HOSTNAME/cert.pem /tmp/
-COPY web/* /tmp/
-RUN /tmp/jetty-keystore.sh $JETTY_VERSION $PASSWORD_CERT_KEY $PASSWORD_PKCS12 $PASSWORD_KEYSTORE $SHIBBOLETH_HOSTNAME
+COPY conf/common/scripts/jetty-keystore.sh conf/$SHIBBOLETH_HOSTNAME/jetty/key.pem conf/$SHIBBOLETH_HOSTNAME/jetty/cert.pem /tmp/
+COPY conf/common/web/* /tmp/
+RUN /tmp/jetty-keystore.sh $JETTY_VERSION $JETTY_CERT_KEY $JETTY_CERT_PKCS12 $JETTY_CERT_KEYSTORE $SHIBBOLETH_HOSTNAME
 
 # Shibboleth IdP -- container dependent steps
 RUN echo idp.no.tidy=true>>/opt/idp.install.properties && \
@@ -133,25 +115,25 @@ RUN echo idp.no.tidy=true>>/opt/idp.install.properties && \
         -Didp.noprompt=true
 
 # Shibboleth IdP -- copy host-specific configuration files
-COPY conf/$SHIBBOLETH_HOSTNAME/attribute-filter.xml \
-     conf/$SHIBBOLETH_HOSTNAME/attribute-resolver.xml \
-     conf/$SHIBBOLETH_HOSTNAME/global.xml \
-     conf/$SHIBBOLETH_HOSTNAME/idp.properties \
-     conf/$SHIBBOLETH_HOSTNAME/ldap.properties \
-     conf/$SHIBBOLETH_HOSTNAME/metadata-providers.xml \
-     conf/$SHIBBOLETH_HOSTNAME/saml-nameid.properties \
-     conf/$SHIBBOLETH_HOSTNAME/saml-nameid.xml \
+COPY conf/$SHIBBOLETH_HOSTNAME/shibboleth-idp/conf/attribute-filter.xml \
+     conf/$SHIBBOLETH_HOSTNAME/shibboleth-idp/conf/attribute-resolver.xml \
+     conf/$SHIBBOLETH_HOSTNAME/shibboleth-idp/conf/global.xml \
+     conf/$SHIBBOLETH_HOSTNAME/shibboleth-idp/conf/idp.properties \
+     conf/$SHIBBOLETH_HOSTNAME/shibboleth-idp/conf/ldap.properties \
+     conf/$SHIBBOLETH_HOSTNAME/shibboleth-idp/conf/metadata-providers.xml \
+     conf/$SHIBBOLETH_HOSTNAME/shibboleth-idp/conf/saml-nameid.properties \
+     conf/$SHIBBOLETH_HOSTNAME/shibboleth-idp/conf/saml-nameid.xml \
      /opt/shibboleth-idp/conf/
 
-COPY conf/$SHIBBOLETH_HOSTNAME/idp-encryption.??? \
-     conf/$SHIBBOLETH_HOSTNAME/idp-signing.??? \
-     conf/$SHIBBOLETH_HOSTNAME/ldap-server.crt \
-     conf/$SHIBBOLETH_HOSTNAME/metadata.eduid.cz.crt.pem \
+COPY conf/$SHIBBOLETH_HOSTNAME/shibboleth-idp/credentials/idp-encryption.??? \
+     conf/$SHIBBOLETH_HOSTNAME/shibboleth-idp/credentials/idp-signing.??? \
+     conf/$SHIBBOLETH_HOSTNAME/shibboleth-idp/credentials/ldap-server.crt \
+     conf/$SHIBBOLETH_HOSTNAME/shibboleth-idp/credentials/metadata.eduid.cz.crt.pem \
      /opt/shibboleth-idp/credentials/
 
 # Shibboleth IdP -- Persistent ID aka eduPersonTargetedID
 RUN sed -i.bak 's%<!-- <ref bean="c14n/SAML2Persistent" /> -->%<ref bean="c14n/SAML2Persistent" />%' /opt/shibboleth-idp/conf/c14n/subject-c14n.xml
-COPY scripts/shibboleth-rebuild.expect /opt
+COPY conf/common/scripts/shibboleth-rebuild.expect /opt
 RUN cd /opt/shibboleth-idp && ../shibboleth-rebuild.expect
 
 # IdP information page

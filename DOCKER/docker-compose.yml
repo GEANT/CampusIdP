@@ -1,42 +1,42 @@
 version: '3.6'
 services:
-  shibboleth-idp:
+  idp:
     build:
       context: .
       args:
-        JAVA_HOME: ${JAVA_HOME}
-        JETTY_VERSION: ${JETTY_VERSION}
-        PASSWORD_CERT_KEY: ${PASSWORD_CERT_KEY}
-        PASSWORD_PKCS12: ${PASSWORD_PKCS12}
-        PASSWORD_KEYSTORE: ${PASSWORD_KEYSTORE}
-        SHIBBOLETH_VERSION: ${SHIBBOLETH_VERSION}
-        SHIBBOLETH_SCOPE: ${SHIBBOLETH_SCOPE}
-        SHIBBOLETH_ENTITYID: ${SHIBBOLETH_ENTITYID}
-        SHIBBOLETH_HOSTNAME: ${SHIBBOLETH_HOSTNAME}
-        SHIBBOLETH_PASSWORD_SEALER: ${SHIBBOLETH_PASSWORD_SEALER}
-        SHIBBOLETH_PASSWORD_KEYSTORE: ${SHIBBOLETH_PASSWORD_KEYSTORE}
+        JAVA_HOME:
+        JETTY_VERSION:
+        JETTY_CERT_KEY:
+        JETTY_CERT_PKCS12:
+        JETTY_CERT_KEYSTORE:
+        SHIBBOLETH_VERSION:
+        SHIBBOLETH_SCOPE:
+        SHIBBOLETH_ENTITYID:
+        SHIBBOLETH_HOSTNAME:
+        SHIBBOLETH_PASSWORD_SEALER:
+        SHIBBOLETH_PASSWORD_KEYSTORE:
     image: shibboleth-idp
     hostname: shibboleth-idp
     volumes:
       - idp-data:/opt
     ports:
-      - 80:8080
-      - 443:8443
+      - 9080:8080
+      - 9443:8443
     depends_on:
-      - mysql
-  mysql:
+      - db
+  db:
     image: mysql:5
     hostname: mysql
     volumes:
       - ./mysql/db:/docker-entrypoint-initdb.d
       - ./mysql/conf:/etc/mysql/conf.d
-      - mysql-data:/var/lib/mysql
+      - db-data:/var/lib/mysql
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD:
+      MYSQL_DATABASE:
+      MYSQL_USER:
+      MYSQL_PASSWORD:
 
 volumes:
   idp-data:
-  mysql-data:
+  db-data:
