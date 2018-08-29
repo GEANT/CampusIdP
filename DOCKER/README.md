@@ -4,6 +4,17 @@ This document briefly describes dockerized _Campus IdP_ platform. It has been de
 
 The primary way to run this is to use `docker-compose` command, but prior to this one has to prepare a few configuration files and load a few variables into the terminal.
 
+## debian:stretch-slim
+
+Using `debian:stretch` official Debian Docker image produces a huge image about XYZ MB. There is also `debian:stretch-slim`, however, it is only 50 MB smaller. It does not make too much sense to switch to _slim_ image so we do not use it. In case you would like to switch, change the first line of `Dockerfile` and also remember to put `mkdir -p /usr/share/man/man1` right before `apt-get install` command due to a [reported bug][].
+
+| Docker image          | size  |
+| --------------------- | -----:|
+| `debian:stretch`      | 540MB |
+| `debian:stretch-slim` | 486MB |
+
+Anyway, MySQL container for storing `persistent-id` (aka `eduPersonTargetedID` attribute) consumes _372MB_ so saving 54MB does not make any difference, sorry.
+
 ## MySQL or MariaDB
 
 Although the current `docker-compose.yml` deploys MySQL (`mysql:5`), it has been tested with MariaDB (`mariadb:10.1`) as well. Just tweak `docker-compose.yml` as follows:
@@ -99,4 +110,6 @@ unset MYSQL_DATABASE
 unset MYSQL_USER
 unset MYSQL_PASSWORD
 ```
+
+[reported bug]: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=863199
 
