@@ -6,7 +6,7 @@ The primary way to run this is to use `docker-compose` command, but prior to thi
 
 ## debian:stretch-slim
 
-Using `debian:stretch` official Debian Docker image produces a huge image about XYZ MB. There is also `debian:stretch-slim`, however, it is only 50 MB smaller. It does not make too much sense to switch to _slim_ image so we do not use it. In case you would like to switch, change the first line of `Dockerfile` and also remember to put `mkdir -p /usr/share/man/man1` right before `apt-get install` command due to a [reported bug][].
+Using `debian:stretch` official Debian Docker image produces quite a huge image about 540MB. There is also `debian:stretch-slim`, however, it is only 50 MB smaller. It does not make too much sense to switch to _slim_ image so we do not use it. In case you would like to switch, change the first line of `Dockerfile` and also remember to put `mkdir -p /usr/share/man/man1` right before `apt-get install` command due to a [reported bug][].
 
 | Docker image          | Size  |
 | --------------------- | -----:|
