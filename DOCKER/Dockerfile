@@ -137,7 +137,7 @@ RUN cd /opt/shibboleth-idp && ../shibboleth-rebuild.expect
 # IdP information page
 RUN /tmp/index.sh
 
-EXPOSE 80 443
+EXPOSE 8080 8443
 
 CMD ["sh", "-c", "java \
     -Djetty.logging.dir=/opt/jetty/logs \
