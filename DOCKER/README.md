@@ -1,6 +1,6 @@
 # Dockerized Campus IdP platform
 
-This document briefly describes dockerized Campus IdP platform. It has been developed and tested using `Docker version 18.03.1-ce` and `docker-compose version 1.21.2` so make sure you are using at least the versions mentioned.
+This document briefly describes dockerized _Campus IdP_ platform. It has been developed and tested using `Docker version 18.03.1-ce` and `docker-compose version 1.21.2` so make sure you are using at least the versions mentioned.
 
 The primary way to run this is to use `docker-compose` command, but prior to this one has to prepare a few configuration files and load a few variables into the terminal.
 
@@ -19,6 +19,8 @@ Although the current `docker-compose.yml` deploys MySQL (`mysql:5`), it has been
 As the first step, you have to prepare `env.conf` file. You should not touch `JAVA_HOME`, `JETTY_VERSION` and `SHIBBOLETH_VERSION` variables unless you know what you are doing.
 
 ### env.conf
+
+This file holds all the information required by an IdP. There are passwords mostly, however, you can define _scope_ and _entityID_ for the IdP etc.
 
 ```
 JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64/jre
@@ -42,13 +44,17 @@ MYSQL_USER=shibboleth
 MYSQL_PASSWORD=miehaiph3chohghoaXah
 ```
 
-Then you must load all the variables in the current shell.
+### Loading variables
+
+Now you must load all the variables in the current shell.
 
 ```bash
 export $(cat conf/idp.example.org/env.conf | xargs)
 ```
 
-Now it is possible to run `docker-compose` command. It is a very good idea to specifi "a project name" using `-p` parameter. I would use domain name or server host name as a value.
+### Start your IdP
+
+And now it is possible to run `docker-compose` command. It is a very good idea to specifi "a project name" using `-p` parameter. I would use domain name or server host name as a value.
 
 ```bash
 docker-compose -p example up -d --build
