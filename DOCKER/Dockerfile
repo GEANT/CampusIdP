@@ -2,35 +2,24 @@ FROM debian:stretch
 
 MAINTAINER Jan Oppolzer <jan@oppolzer.cz>
 
-# Common variables
-## Java
+RUN apt-get -qq update && \
+    apt-get -qq -y --no-install-recommends install \
+        wget \
+        expect \
+        openjdk-8-jre-headless \
+        gnupg2 \
+        dirmngr && \
+    rm -rf /var/lib/apt/lists/*
+
 ARG JAVA_HOME
 ENV JAVA_HOME=$JAVA_HOME
 
-## Jetty
 ARG JETTY_VERSION
 ENV JETTY_VERSION=$JETTY_VERSION
 
-## Shibboleth IdP
-ARG SHIBBOLETH_VERSION
-ENV SHIBBOLETH_VERSION=$SHIBBOLETH_VERSION
+COPY gpg/joakim.erdfelt_gmail.com.key /root/gpg/
+RUN gpg -q --import /root/gpg/joakim.erdfelt_gmail.com.key
 
-# update APT cache and install required packages
-RUN apt-get -qq update && \
-    apt-get -qq -y --no-install-recommends install \
-    wget \
-    expect \
-    openjdk-8-jre-headless \
-    gnupg2 \
-    dirmngr && \
-    rm -rf /var/lib/apt/lists/*
-
-# import GPG keys
-COPY gpg/ /root/gpg/
-RUN gpg -q --import /root/gpg/joakim.erdfelt_gmail.com.key && \
-    gpg -q --import /root/gpg/tzeller_dragonacea.biz.key
-
-# Jetty -- common steps
 RUN groupadd idp && \
     useradd -m -g idp -s /bin/bash idp && \
     mkdir -p /opt/src /opt/jetty && \
@@ -61,13 +50,24 @@ RUN groupadd idp && \
 COPY conf/common/jetty/idp.xml /opt/jetty/webapps
 COPY conf/common/jetty/tweak-ssl.xml /opt/jetty/etc
 
-# Shibboleth IdP -- common steps
+ARG SHIBBOLETH_VERSION
+ENV SHIBBOLETH_VERSION=$SHIBBOLETH_VERSION
+
+COPY gpg/tzeller_dragonacea.biz.key /root/gpg/
+RUN gpg -q --import /root/gpg/tzeller_dragonacea.biz.key
+
 RUN wget -q -P /opt/src/ https://shibboleth.net/downloads/identity-provider/$SHIBBOLETH_VERSION/shibboleth-identity-provider-$SHIBBOLETH_VERSION.tar.gz \
                          https://shibboleth.net/downloads/identity-provider/$SHIBBOLETH_VERSION/shibboleth-identity-provider-$SHIBBOLETH_VERSION.tar.gz.asc \
                          https://shibboleth.net/downloads/identity-provider/$SHIBBOLETH_VERSION/shibboleth-identity-provider-$SHIBBOLETH_VERSION.tar.gz.sha256 && \
     cd /opt/src && sha256sum -c shibboleth-identity-provider-$SHIBBOLETH_VERSION.tar.gz.sha256 && \
     gpg -q --verify /opt/src/shibboleth-identity-provider-$SHIBBOLETH_VERSION.tar.gz.asc && \
     tar -xzf /opt/src/shibboleth-identity-provider-$SHIBBOLETH_VERSION.tar.gz -C /opt
+
+####################################################
+#                                                  #
+# All the stuff bellow should go to entryscript.sh #
+#                                                  #
+####################################################
 
 # Container dependent variables
 ## Jetty
