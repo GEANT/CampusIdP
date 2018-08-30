@@ -4,21 +4,20 @@ services:
     build:
       context: .
       args:
-        JAVA_HOME:
         JETTY_VERSION:
         JETTY_CERT_KEY:
         JETTY_CERT_PKCS12:
-        JETTY_CERT_KEYSTORE:
         SHIBBOLETH_VERSION:
         SHIBBOLETH_SCOPE:
         SHIBBOLETH_ENTITYID:
         SHIBBOLETH_HOSTNAME:
-        SHIBBOLETH_PASSWORD_SEALER:
-        SHIBBOLETH_PASSWORD_KEYSTORE:
     image: shibboleth-idp
     hostname: shibboleth-idp
     volumes:
       - idp-data:/opt
+      - ./conf/${SHIBBOLETH_HOSTNAME}/shibboleth-idp/conf:/tmp/shibboleth-idp/conf
+      - ./conf/${SHIBBOLETH_HOSTNAME}/shibboleth-idp/credentials:/tmp/shibboleth-idp/credentials
+      - ./conf/${SHIBBOLETH_HOSTNAME}/jetty:/tmp/jetty
     ports:
       - 9080:8080
       - 9443:8443

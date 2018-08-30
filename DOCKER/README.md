@@ -4,6 +4,19 @@ This document briefly describes dockerized _Campus IdP_ platform. It has been de
 
 The primary way to run this is to use `docker-compose` command, but prior to this one has to prepare a few configuration files and load a few variables into the terminal.
 
+## debian:stretch-slim
+
+Using `debian:stretch` official Debian Docker image produces quite a huge image about 540MB. There is also `debian:stretch-slim`, however, it is only 50 MB smaller. It does not make too much sense to switch to _slim_ image so we do not use it. In case you would like to switch, change the first line of `Dockerfile` and also remember to put `mkdir -p /usr/share/man/man1` right before `apt-get install` command due to a [reported bug][].
+
+| Docker image          | Size  |
+| --------------------- | -----:|
+| `debian:stretch`      | 540MB |
+| `debian:stretch-slim` | 486MB |
+| `mysql:5`             | 372MB |
+| `mariadb:10.1`        | 407MB |
+
+Anyway, MySQL container for storing `persistent-id` (aka `eduPersonTargetedID` attribute) consumes _372MB_ so saving 54MB does not make any difference, sorry.
+
 ## MySQL or MariaDB
 
 Although the current `docker-compose.yml` deploys MySQL (`mysql:5`), it has been tested with MariaDB (`mariadb:10.1`) as well. Just tweak `docker-compose.yml` as follows:
@@ -16,15 +29,13 @@ Although the current `docker-compose.yml` deploys MySQL (`mysql:5`), it has been
 
 ## Run an IdP
 
-As the first step, you have to prepare `env.conf` file. You should not touch `JAVA_HOME`, `JETTY_VERSION` and `SHIBBOLETH_VERSION` variables unless you know what you are doing.
+As the first step, you have to prepare `env.conf` file. You should not touch `JETTY_VERSION` and `SHIBBOLETH_VERSION` variables unless you know what you are doing.
 
 ### env.conf
 
 This file holds all the information required by an IdP. There are passwords mostly, however, you can define _scope_ and _entityID_ for the IdP etc.
 
 ```
-JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64/jre
-
 JETTY_VERSION=9.3.24.v20180605
 JETTY_CERT_KEY=iemooP4mu3neuPhiequi
 JETTY_CERT_PKCS12=Aihoo5aich5eetohX9oh
@@ -79,8 +90,6 @@ docker-compose -p example down --rmi all -v --remove-orphans
 You can override all variables by loading a different file. You can also simply unset variables or even simpler close the current shell.
 
 ```bash
-unset JAVA_HOME
-
 unset JETTY_VERSION
 unset JETTY_CERT_KEY
 unset JETTY_CERT_PKCS12
@@ -99,4 +108,6 @@ unset MYSQL_DATABASE
 unset MYSQL_USER
 unset MYSQL_PASSWORD
 ```
+
+[reported bug]: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=863199
 
