@@ -2,6 +2,8 @@
 
 set -e
 
+/tmp/jetty-keystore.sh $JETTY_VERSION $JETTY_CERT_KEY $JETTY_CERT_PKCS12 $JETTY_CERT_KEYSTORE $SHIBBOLETH_HOSTNAME
+
 /opt/shibboleth-idp && \
     ../shibboleth-rebuild.expect
 
