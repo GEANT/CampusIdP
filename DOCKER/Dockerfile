@@ -134,7 +134,6 @@ COPY conf/common/scripts/shibboleth-rebuild.expect /opt
 EXPOSE 8080 8443
 
 COPY docker-entrypoint.sh /
-RUN chmod 700 ./docker-entrypoint.sh
 
 ENTRYPOINT ["./docker-entrypoint.sh"]
 CMD ["${JETTY_VERSION}"]
