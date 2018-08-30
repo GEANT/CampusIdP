@@ -112,23 +112,6 @@ RUN echo idp.no.tidy=true>>/opt/idp.install.properties && \
         -Didp.keystore.password=$SHIBBOLETH_PASSWORD_KEYSTORE \
         -Didp.noprompt=true
 
-# Shibboleth IdP -- copy host-specific configuration files
-COPY conf/$SHIBBOLETH_HOSTNAME/shibboleth-idp/conf/attribute-filter.xml \
-     conf/$SHIBBOLETH_HOSTNAME/shibboleth-idp/conf/attribute-resolver.xml \
-     conf/$SHIBBOLETH_HOSTNAME/shibboleth-idp/conf/global.xml \
-     conf/$SHIBBOLETH_HOSTNAME/shibboleth-idp/conf/idp.properties \
-     conf/$SHIBBOLETH_HOSTNAME/shibboleth-idp/conf/ldap.properties \
-     conf/$SHIBBOLETH_HOSTNAME/shibboleth-idp/conf/metadata-providers.xml \
-     conf/$SHIBBOLETH_HOSTNAME/shibboleth-idp/conf/saml-nameid.properties \
-     conf/$SHIBBOLETH_HOSTNAME/shibboleth-idp/conf/saml-nameid.xml \
-     /opt/shibboleth-idp/conf/
-
-COPY conf/$SHIBBOLETH_HOSTNAME/shibboleth-idp/credentials/idp-encryption.??? \
-     conf/$SHIBBOLETH_HOSTNAME/shibboleth-idp/credentials/idp-signing.??? \
-     conf/$SHIBBOLETH_HOSTNAME/shibboleth-idp/credentials/ldap-server.crt \
-     conf/$SHIBBOLETH_HOSTNAME/shibboleth-idp/credentials/metadata.eduid.cz.crt.pem \
-     /opt/shibboleth-idp/credentials/
-
 COPY conf/common/scripts/shibboleth-rebuild.expect /opt
 
 EXPOSE 8080 8443

@@ -2,12 +2,21 @@
 
 set -e
 
-/tmp/index.sh
-
 /opt/shibboleth-idp && \
     ../shibboleth-rebuild.expect
 
 sed -i.bak 's%<!-- <ref bean="c14n/SAML2Persistent" /> -->%<ref bean="c14n/SAML2Persistent" />%' /opt/shibboleth-idp/conf/c14n/subject-c14n.xml
+
+for f in /tmp/shibboleth-idp/conf/*; do
+    cp $f /opt/shibboleth-idp/conf/
+done
+
+for f in /tmp/shibboleth-idp/credentials/*; do
+    cp $f /opt/shibboleth-idp/credentials/
+done
+
+
+/tmp/index.sh
 
 exec java \
     -Djetty.logging.dir=/opt/jetty/logs \
