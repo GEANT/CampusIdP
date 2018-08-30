@@ -92,22 +92,6 @@ COPY conf/common/web/* /tmp/
 COPY conf/common/scripts/shibboleth-rebuild.expect /opt
 COPY docker-entrypoint.sh /
 
-RUN echo idp.no.tidy=true>>/opt/idp.install.properties && \
-    echo idp.scope=$SHIBBOLETH_SCOPE>>/opt/idp.merge.properties && \
-    echo idp.entityID=$SHIBBOLETH_ENTITYID>>/opt/idp.merge.properties && \
-    echo idp.sealer.storePassword=$SHIBBOLETH_PASSWORD_SEALER>>/opt/idp.merge.properties && \
-    echo idp.sealer.keyPassword=$SHIBBOLETH_PASSWORD_SEALER>>/opt/idp.merge.properties && \
-    /opt/shibboleth-identity-provider-$SHIBBOLETH_VERSION/bin/install.sh \
-        -Didp.property.file=/opt/idp.install.properties \
-        -Didp.merge.properties=/opt/idp.merge.properties \
-        -Didp.src.dir=/opt/shibboleth-identity-provider-$SHIBBOLETH_VERSION \
-        -Didp.target.dir=/opt/shibboleth-idp \
-        -Didp.scope=$SHIBBOLETH_SCOPE \
-        -Didp.host.name=$SHIBBOLETH_HOSTNAME \
-        -Didp.sealer.password=$SHIBBOLETH_PASSWORD_SEALER \
-        -Didp.keystore.password=$SHIBBOLETH_PASSWORD_KEYSTORE \
-        -Didp.noprompt=true
-
 EXPOSE 8080 8443
 
 ENTRYPOINT ["./docker-entrypoint.sh"]

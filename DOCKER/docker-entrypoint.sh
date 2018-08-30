@@ -4,6 +4,30 @@ set -e
 
 /tmp/jetty-keystore.sh $JETTY_VERSION $JETTY_CERT_KEY $JETTY_CERT_PKCS12 $JETTY_CERT_KEYSTORE $SHIBBOLETH_HOSTNAME
 
+### Build Shibboleth IdP
+cat <<EOF > /opt/idp.install.properties
+idp.no.tidy=true
+EOF
+
+cat <<EOF > /opt/idp.merge.properties
+idp.scope=$SHIBBOLETH_SCOPE
+idp.entityID=$SHIBBOLETH_ENTITYID
+idp.sealer.storePassword=$SHIBBOLETH_PASSWORD_SEALER
+idp.sealer.keyPassword=$SHIBBOLETH_PASSWORD_SEALER
+EOF
+
+/opt/shibboleth-identity-provider-$SHIBBOLETH_VERSION/bin/install.sh \
+    -Didp.property.file=/opt/idp.install.properties \
+    -Didp.merge.properties=/opt/idp.merge.properties \
+    -Didp.src.dir=/opt/shibboleth-identity-provider-$SHIBBOLETH_VERSION \
+    -Didp.target.dir=/opt/shibboleth-idp \
+    -Didp.scope=$SHIBBOLETH_SCOPE \
+    -Didp.host.name=$SHIBBOLETH_HOSTNAME \
+    -Didp.sealer.password=$SHIBBOLETH_PASSWORD_SEALER \
+    -Didp.keystore.password=$SHIBBOLETH_PASSWORD_KEYSTORE \
+    -Didp.noprompt=true
+###
+
 /opt/shibboleth-idp && \
     ../shibboleth-rebuild.expect
 
