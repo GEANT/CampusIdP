@@ -39,14 +39,11 @@ This file holds all the information required by an IdP. There are passwords most
 JETTY_VERSION=9.3.24.v20180605
 JETTY_CERT_KEY=iemooP4mu3neuPhiequi
 JETTY_CERT_PKCS12=Aihoo5aich5eetohX9oh
-JETTY_CERT_KEYSTORE=aawiega2noafa5oDaij2
 
 SHIBBOLETH_VERSION=3.3.3
 SHIBBOLETH_SCOPE=idp.example.org
 SHIBBOLETH_ENTITYID=https://idp.example.org/idp/shibboleth
 SHIBBOLETH_HOSTNAME=idp.example.org
-SHIBBOLETH_PASSWORD_SEALER=aiphai5tahXie1tei4go
-SHIBBOLETH_PASSWORD_KEYSTORE=lo8Aedeipeichaipoo6o
 SHIBBOLETH_PID_SALT=ceek9xa0Ahmoh0uyiwah
 
 MYSQL_ROOT_PASSWORD=shie9aez5Ahzakah9aen
@@ -93,14 +90,11 @@ You can override all variables by loading a different file. You can also simply 
 unset JETTY_VERSION
 unset JETTY_CERT_KEY
 unset JETTY_CERT_PKCS12
-unset JETTY_CERT_KEYSTORE
 
 unset SHIBBOLETH_VERSION
 unset SHIBBOLETH_SCOPE
 unset SHIBBOLETH_ENTITYID
 unset SHIBBOLETH_HOSTNAME
-unset SHIBBOLETH_PASSWORD_SEALER
-unset SHIBBOLETH_PASSWORD_KEYSTORE
 unset SHIBBOLETH_PID_SALT
 
 unset MYSQL_ROOT_PASSWORD
