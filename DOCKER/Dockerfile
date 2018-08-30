@@ -11,13 +11,15 @@ RUN apt-get -qq update && \
         dirmngr && \
     rm -rf /var/lib/apt/lists/*
 
-ENV JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64/jre
-
 ARG JETTY_VERSION
-ENV JETTY_VERSION=$JETTY_VERSION
+ARG SHIBBOLETH_VERSION
+ENV JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64/jre \
+    JETTY_VERSION=$JETTY_VERSION \
+    SHIBBOLETH_VERSION=$SHIBBOLETH_VERSION
 
-COPY gpg/joakim.erdfelt_gmail.com.key /root/gpg/
-RUN gpg -q --import /root/gpg/joakim.erdfelt_gmail.com.key
+COPY gpg/ /root/gpg/
+RUN gpg -q --import /root/gpg/joakim.erdfelt_gmail.com.key && \
+    gpg -q --import /root/gpg/tzeller_dragonacea.biz.key
 
 RUN groupadd idp && \
     useradd -m -g idp -s /bin/bash idp && \
@@ -49,24 +51,12 @@ RUN groupadd idp && \
 COPY conf/common/jetty/idp.xml /opt/jetty/webapps
 COPY conf/common/jetty/tweak-ssl.xml /opt/jetty/etc
 
-ARG SHIBBOLETH_VERSION
-ENV SHIBBOLETH_VERSION=$SHIBBOLETH_VERSION
-
-COPY gpg/tzeller_dragonacea.biz.key /root/gpg/
-RUN gpg -q --import /root/gpg/tzeller_dragonacea.biz.key
-
 RUN wget -q -P /opt/src/ https://shibboleth.net/downloads/identity-provider/$SHIBBOLETH_VERSION/shibboleth-identity-provider-$SHIBBOLETH_VERSION.tar.gz \
                          https://shibboleth.net/downloads/identity-provider/$SHIBBOLETH_VERSION/shibboleth-identity-provider-$SHIBBOLETH_VERSION.tar.gz.asc \
                          https://shibboleth.net/downloads/identity-provider/$SHIBBOLETH_VERSION/shibboleth-identity-provider-$SHIBBOLETH_VERSION.tar.gz.sha256 && \
     cd /opt/src && sha256sum -c shibboleth-identity-provider-$SHIBBOLETH_VERSION.tar.gz.sha256 && \
     gpg -q --verify /opt/src/shibboleth-identity-provider-$SHIBBOLETH_VERSION.tar.gz.asc && \
     tar -xzf /opt/src/shibboleth-identity-provider-$SHIBBOLETH_VERSION.tar.gz -C /opt
-
-####################################################
-#                                                  #
-# All the stuff bellow should go to entryscript.sh #
-#                                                  #
-####################################################
 
 ARG JETTY_CERT_KEY
 ARG JETTY_CERT_PKCS12
@@ -80,9 +70,7 @@ ENV SHIBBOLETH_SCOPE=$SHIBBOLETH_SCOPE \
     SHIBBOLETH_ENTITYID=$SHIBBOLETH_ENTITYID \
     SHIBBOLETH_HOSTNAME=$SHIBBOLETH_HOSTNAME
 
-COPY conf/common/scripts/jetty-keystore.sh /tmp/
-COPY conf/common/web/* /tmp/
-COPY conf/common/scripts/shibboleth-rebuild.expect /opt
+COPY conf/common/scripts/ /tmp/
 COPY docker-entrypoint.sh /
 
 EXPOSE 8080 8443
