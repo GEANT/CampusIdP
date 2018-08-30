@@ -69,8 +69,6 @@ RUN wget -q -P /opt/src/ https://shibboleth.net/downloads/identity-provider/$SHI
 #                                                  #
 ####################################################
 
-# Container dependent variables
-## Jetty
 ARG JETTY_CERT_KEY
 ARG JETTY_CERT_PKCS12
 ARG JETTY_CERT_KEYSTORE
@@ -78,7 +76,6 @@ ENV JETTY_CERT_KEY=$JETTY_CERT_KEY \
     JETTY_CERT_PKCS12=$JETTY_CERT_PKCS12 \
     JETTY_CERT_KEYSTORE=$JETTY_CERT_KEYSTORE
 
-## Shibboleth IdP
 ARG SHIBBOLETH_SCOPE
 ARG SHIBBOLETH_ENTITYID
 ARG SHIBBOLETH_HOSTNAME
@@ -90,11 +87,11 @@ ENV SHIBBOLETH_SCOPE=$SHIBBOLETH_SCOPE \
     SHIBBOLETH_PASSWORD_SEALER=$SHIBBOLETH_PASSWORD_SEALER \
     SHIBBOLETH_PASSWORD_KEYSTORE=$SHIBBOLETH_PASSWORD_KEYSTORE
 
-# Jetty -- container dependent steps
 COPY conf/common/scripts/jetty-keystore.sh /tmp/
 COPY conf/common/web/* /tmp/
+COPY conf/common/scripts/shibboleth-rebuild.expect /opt
+COPY docker-entrypoint.sh /
 
-# Shibboleth IdP -- container dependent steps
 RUN echo idp.no.tidy=true>>/opt/idp.install.properties && \
     echo idp.scope=$SHIBBOLETH_SCOPE>>/opt/idp.merge.properties && \
     echo idp.entityID=$SHIBBOLETH_ENTITYID>>/opt/idp.merge.properties && \
@@ -111,11 +108,7 @@ RUN echo idp.no.tidy=true>>/opt/idp.install.properties && \
         -Didp.keystore.password=$SHIBBOLETH_PASSWORD_KEYSTORE \
         -Didp.noprompt=true
 
-COPY conf/common/scripts/shibboleth-rebuild.expect /opt
-
 EXPOSE 8080 8443
-
-COPY docker-entrypoint.sh /
 
 ENTRYPOINT ["./docker-entrypoint.sh"]
 CMD ["${JETTY_VERSION}"]
