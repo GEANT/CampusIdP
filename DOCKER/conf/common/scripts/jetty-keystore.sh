@@ -8,14 +8,13 @@
 # $1    -- JETTY_VERSION set in Dockerfile
 # $2    -- a private key password
 # $3    -- a password for PKCS12 format
-# $4    -- a keystore password
-# $5    -- SHIBBOLETH_HOSTNAME set in Dockerfile
+# $4    -- SHIBBOLETH_HOSTNAME set in Dockerfile
 
 JETTY_VERSION=$1
 PASSWORDKEY=$2
 PASSWORDPKCS12=$3
-PASSWORDKEYSTORE=$4
-SHIBBOLETH_HOSTNAME=$5
+SHIBBOLETH_HOSTNAME=$4
+PASSWORDKEYSTORE=`tr -cd '[:alnum:]' < /dev/urandom | fold -w30 | head -n1`
 
 obfpass() {
     java -cp /opt/jetty-distribution-$JETTY_VERSION/lib/jetty-util-$JETTY_VERSION.jar org.eclipse.jetty.util.security.Password $1 2>&1 | grep OBF\:

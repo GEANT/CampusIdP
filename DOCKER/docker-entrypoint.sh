@@ -2,7 +2,7 @@
 
 set -e
 
-/tmp/jetty-keystore.sh $JETTY_VERSION $JETTY_CERT_KEY $JETTY_CERT_PKCS12 $JETTY_CERT_KEYSTORE $SHIBBOLETH_HOSTNAME
+/tmp/jetty-keystore.sh $JETTY_VERSION $JETTY_CERT_KEY $JETTY_CERT_PKCS12 $SHIBBOLETH_HOSTNAME
 
 ### Build Shibboleth IdP
 SHIBBOLETH_PASSWORD_SEALER=`tr -cd '[:alnum:]' < /dev/urandom | fold -w30 | head -n1`
