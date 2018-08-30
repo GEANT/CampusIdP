@@ -12,8 +12,6 @@ services:
         SHIBBOLETH_SCOPE:
         SHIBBOLETH_ENTITYID:
         SHIBBOLETH_HOSTNAME:
-        SHIBBOLETH_PASSWORD_SEALER:
-        SHIBBOLETH_PASSWORD_KEYSTORE:
     image: shibboleth-idp
     hostname: shibboleth-idp
     volumes:

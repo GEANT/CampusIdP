@@ -5,6 +5,9 @@ set -e
 /tmp/jetty-keystore.sh $JETTY_VERSION $JETTY_CERT_KEY $JETTY_CERT_PKCS12 $JETTY_CERT_KEYSTORE $SHIBBOLETH_HOSTNAME
 
 ### Build Shibboleth IdP
+SHIBBOLETH_PASSWORD_SEALER=`tr -cd '[:alnum:]' < /dev/urandom | fold -w30 | head -n1`
+SHIBBOLETH_PASSWORD_KEYSTORE=`tr -cd '[:alnum:]' < /dev/urandom | fold -w30 | head -n1`
+
 cat <<EOF > /opt/idp.install.properties
 idp.no.tidy=true
 EOF
@@ -41,6 +44,13 @@ for f in /tmp/shibboleth-idp/credentials/*; do
     cp $f /opt/shibboleth-idp/credentials/
 done
 
+### Change passwords
+sed \
+    -i.bak \
+    -e "s/idp\.sealer\.storePassword\=\s*.*/idp.sealer.storePassword= ${SHIBBOLETH_PASSWORD_SEALER}/" \
+    -e "s/idp\.sealer\.keyPassword\=\s*.*/idp.sealer.keyPassword= ${SHIBBOLETH_PASSWORD_SEALER}/" \
+    /opt/shibboleth-idp/conf/idp.properties
+###
 
 /tmp/index.sh
 
