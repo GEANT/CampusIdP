@@ -139,15 +139,9 @@ RUN /tmp/index.sh
 
 EXPOSE 8080 8443
 
-CMD ["sh", "-c", "java \
-    -Djetty.logging.dir=/opt/jetty/logs \
-    -Djetty.home=/opt/jetty-distribution-$JETTY_VERSION \
-    -Djetty.base=/opt/jetty \
-    -Djava.io.tmpdir=/tmp \
-    -jar \
-    /opt/jetty-distribution-$JETTY_VERSION/start.jar \
-    jetty.state=/opt/jetty/jetty.state \
-    jetty-logging.xml \
-    jetty-started.xml \
-    start-log-file=/opt/jetty/logs/start.log"]
+COPY docker-entrypoint.sh /
+RUN chmod 700 ./docker-entrypoint.sh
+
+ENTRYPOINT ["./docker-entrypoint.sh"]
+CMD ["${JETTY_VERSION}"]
 
