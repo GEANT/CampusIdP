@@ -4,6 +4,9 @@ set -e
 
 /tmp/index.sh
 
+/opt/shibboleth-idp && \
+    ../shibboleth-rebuild.expect
+
 exec java \
     -Djetty.logging.dir=/opt/jetty/logs \
     -Djetty.home=/opt/jetty-distribution-$JETTY_VERSION \
