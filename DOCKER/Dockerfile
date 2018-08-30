@@ -134,9 +134,6 @@ RUN sed -i.bak 's%<!-- <ref bean="c14n/SAML2Persistent" /> -->%<ref bean="c14n/S
 COPY conf/common/scripts/shibboleth-rebuild.expect /opt
 RUN cd /opt/shibboleth-idp && ../shibboleth-rebuild.expect
 
-# IdP information page
-RUN /tmp/index.sh
-
 EXPOSE 8080 8443
 
 COPY docker-entrypoint.sh /
