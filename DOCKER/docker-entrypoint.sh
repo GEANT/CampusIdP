@@ -28,7 +28,7 @@ EOF
     -Didp.noprompt=true
 ###
 
-/opt/shibboleth-idp && \
+cd /opt/shibboleth-idp && \
     ../shibboleth-rebuild.expect
 
 sed -i.bak 's%<!-- <ref bean="c14n/SAML2Persistent" /> -->%<ref bean="c14n/SAML2Persistent" />%' /opt/shibboleth-idp/conf/c14n/subject-c14n.xml
