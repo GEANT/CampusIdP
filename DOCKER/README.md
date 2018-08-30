@@ -29,15 +29,13 @@ Although the current `docker-compose.yml` deploys MySQL (`mysql:5`), it has been
 
 ## Run an IdP
 
-As the first step, you have to prepare `env.conf` file. You should not touch `JAVA_HOME`, `JETTY_VERSION` and `SHIBBOLETH_VERSION` variables unless you know what you are doing.
+As the first step, you have to prepare `env.conf` file. You should not touch `JETTY_VERSION` and `SHIBBOLETH_VERSION` variables unless you know what you are doing.
 
 ### env.conf
 
 This file holds all the information required by an IdP. There are passwords mostly, however, you can define _scope_ and _entityID_ for the IdP etc.
 
 ```
-JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64/jre
-
 JETTY_VERSION=9.3.24.v20180605
 JETTY_CERT_KEY=iemooP4mu3neuPhiequi
 JETTY_CERT_PKCS12=Aihoo5aich5eetohX9oh
@@ -92,8 +90,6 @@ docker-compose -p example down --rmi all -v --remove-orphans
 You can override all variables by loading a different file. You can also simply unset variables or even simpler close the current shell.
 
 ```bash
-unset JAVA_HOME
-
 unset JETTY_VERSION
 unset JETTY_CERT_KEY
 unset JETTY_CERT_PKCS12

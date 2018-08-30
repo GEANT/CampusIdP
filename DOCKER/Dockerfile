@@ -11,8 +11,7 @@ RUN apt-get -qq update && \
         dirmngr && \
     rm -rf /var/lib/apt/lists/*
 
-ARG JAVA_HOME
-ENV JAVA_HOME=$JAVA_HOME
+ENV JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64/jre
 
 ARG JETTY_VERSION
 ENV JETTY_VERSION=$JETTY_VERSION

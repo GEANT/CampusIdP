@@ -4,7 +4,6 @@ services:
     build:
       context: .
       args:
-        JAVA_HOME:
         JETTY_VERSION:
         JETTY_CERT_KEY:
         JETTY_CERT_PKCS12:
