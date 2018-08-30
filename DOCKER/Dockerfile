@@ -129,8 +129,6 @@ COPY conf/$SHIBBOLETH_HOSTNAME/shibboleth-idp/credentials/idp-encryption.??? \
      conf/$SHIBBOLETH_HOSTNAME/shibboleth-idp/credentials/metadata.eduid.cz.crt.pem \
      /opt/shibboleth-idp/credentials/
 
-# Shibboleth IdP -- Persistent ID aka eduPersonTargetedID
-RUN sed -i.bak 's%<!-- <ref bean="c14n/SAML2Persistent" /> -->%<ref bean="c14n/SAML2Persistent" />%' /opt/shibboleth-idp/conf/c14n/subject-c14n.xml
 COPY conf/common/scripts/shibboleth-rebuild.expect /opt
 
 EXPOSE 8080 8443

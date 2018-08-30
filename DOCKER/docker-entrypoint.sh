@@ -7,6 +7,8 @@ set -e
 /opt/shibboleth-idp && \
     ../shibboleth-rebuild.expect
 
+sed -i.bak 's%<!-- <ref bean="c14n/SAML2Persistent" /> -->%<ref bean="c14n/SAML2Persistent" />%' /opt/shibboleth-idp/conf/c14n/subject-c14n.xml
+
 exec java \
     -Djetty.logging.dir=/opt/jetty/logs \
     -Djetty.home=/opt/jetty-distribution-$JETTY_VERSION \
