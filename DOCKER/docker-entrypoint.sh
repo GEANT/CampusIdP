@@ -48,6 +48,19 @@ sed \
     -e "s/idp\.sealer\.keyPassword\=\s*.*/idp.sealer.keyPassword= ${SHIBBOLETH_PASSWORD_SEALER}/" \
     /opt/shibboleth-idp/conf/idp.properties
 
+sed \
+    -i.bak \
+    -e "s%^#idp.authn.LDAP.authenticator\s*=.*%idp.authn.LDAP.authenticator= "${LDAP_AUTHENTICATOR}"%" \
+    -e "s%^idp.authn.LDAP.ldapURL\s*=.*%idp.authn.LDAP.ldapURL= "${LDAP_LDAPURL}"%" \
+    -e "s%^#idp.authn.LDAP.useStartTLS\s*=.*%idp.authn.LDAP.useStartTLS= "${LDAP_USESTARTTLS}"%" \
+    -e "s%^#idp.authn.LDAP.useSSL\s*=.*%idp.authn.LDAP.useSSL= "${LDAP_USESSL}"%" \
+    -e "s%^#idp.authn.LDAP.sslConfig\s*=.*%idp.authn.LDAP.sslConfig= "${LDAP_SSLCONFIG}"%" \
+    -e "s%^idp.authn.LDAP.baseDN\s*=.*%idp.authn.LDAP.baseDN= "${LDAP_BASEDN}"%" \
+    -e "s%^#idp.authn.LDAP.subtreeSearch\s*=.*%idp.authn.LDAP.subtreeSearch= "${LDAP_SUBTREESEARCH}"%" \
+    -e "s%^idp.authn.LDAP.bindDN\s*=.*%idp.authn.LDAP.bindDN= ${LDAP_BINDDN}%" \
+    -e "s%^idp.authn.LDAP.bindDNCredential\s*=.*%idp.authn.LDAP.bindDNCredential= "${LDAP_BINDDNCREDENTIAL}"%" \
+    /opt/shibboleth-idp/conf/ldap.properties
+
 /tmp/index.sh
 
 exec java \

@@ -1,6 +1,7 @@
 version: '3.6'
 services:
   idp:
+    env_file: conf/${SHIBBOLETH_HOSTNAME}/idp.conf
     build:
       context: .
       args:
