@@ -17,6 +17,8 @@ Using `debian:stretch` official Debian Docker image produces an image 339MB in s
 
 Althoug, MySQL container for storing `persistent-id` (aka `eduPersonTargetedID` attribute) consumes _372MB_, saving 53MB could make a difference for someone.
 
+It could be saved 48MB by deleting `/opt/shibboleth-identity-provider-$SHIBBOLETH_VERSION/` directory which is not neccessary after it has been installed using `install.sh` script. However, that assumes the installation is run from the `Dockerfile` not `docker-entrypoint.sh`. And I am sure it is not worth it.
+
 ## MySQL or MariaDB
 
 Although the current `docker-compose.yml` deploys MySQL (`mysql:5`), it has been tested with MariaDB (`mariadb:10.1`) as well. Just tweak `docker-compose.yml` as follows:
