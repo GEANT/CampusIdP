@@ -6,7 +6,6 @@ services:
       args:
         JETTY_VERSION:
         JETTY_CERT_KEY:
-        JETTY_CERT_PKCS12:
         SHIBBOLETH_VERSION:
         SHIBBOLETH_SCOPE:
         SHIBBOLETH_ENTITYID:

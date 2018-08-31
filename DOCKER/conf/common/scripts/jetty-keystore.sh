@@ -1,19 +1,18 @@
 #!/usr/bin/env bash
 #
-# /tmp/key.pem              -- a private key
-# /tmp/cert.pem             -- a certificate with full chain
+# /tmp/jetty/key.pem        -- a private key
+# /tmp/jetty/cert.pem       -- a certificate with full chain
 # /tmp/jetty-cert.pkcs12    -- PKCS12 format
 # /opt/jetty/etc/keystore   -- final keystore for Jetty
 #
 # $1    -- JETTY_VERSION set in Dockerfile
 # $2    -- a private key password
-# $3    -- a password for PKCS12 format
-# $4    -- SHIBBOLETH_HOSTNAME set in Dockerfile
+# $3    -- SHIBBOLETH_HOSTNAME set in Dockerfile
 
 JETTY_VERSION=$1
 PASSWORDKEY=$2
-PASSWORDPKCS12=$3
-SHIBBOLETH_HOSTNAME=$4
+SHIBBOLETH_HOSTNAME=$3
+PASSWORDPKCS12=`tr -cd '[:alnum:]' < /dev/urandom | fold -w30 | head -n1`
 PASSWORDKEYSTORE=`tr -cd '[:alnum:]' < /dev/urandom | fold -w30 | head -n1`
 
 obfpass() {
