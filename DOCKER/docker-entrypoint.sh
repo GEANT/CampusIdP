@@ -56,6 +56,44 @@ sed \
     -e "s%^idp.authn.LDAP.bindDNCredential\s*=.*%idp.authn.LDAP.bindDNCredential= "${LDAP_BINDDNCREDENTIAL}"%" \
     /opt/shibboleth-idp/conf/ldap.properties
 
+CONFIGURATION=`cat <<EOF
+<bean id="shibboleth.MySQLDataSource"
+    class="org.apache.commons.dbcp2.BasicDataSource"
+    p:driverClassName="com.mysql.jdbc.Driver"
+    p:url="jdbc:mysql://db:3306/shibboleth"
+    p:username="${MYSQL_USER}"
+    p:password="${MYSQL_PASSWORD}" />
+
+<bean id="shibboleth.JPAStorageService"
+    class="org.opensaml.storage.impl.JPAStorageService"
+    p:cleanupInterval="%{idp.storage.cleanupInterval:PT10M}"
+    c:factory-ref="shibboleth.JPAStorageService.entityManagerFactory" />
+
+<bean id="shibboleth.JPAStorageService.entityManagerFactory"
+    class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+    <property name="packagesToScan" value="org.opensaml.storage.impl"/>
+    <property name="dataSource" ref="shibboleth.MySQLDataSource"/>
+    <property name="jpaVendorAdapter" ref="shibboleth.JPAStorageService.JPAVendorAdapter"/>
+    <property name="jpaDialect">
+        <bean class="org.springframework.orm.jpa.vendor.HibernateJpaDialect" />
+    </property>
+</bean>
+
+<bean id="shibboleth.JPAStorageService.JPAVendorAdapter"
+    class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter"
+    p:generateDdl="true"
+    p:database="MYSQL"
+    p:databasePlatform="org.hibernate.dialect.MySQL5Dialect" />
+EOF
+`
+sed \
+    -i.bak \
+    '$d' \
+    /opt/shibboleth-idp/conf/global.xml
+
+echo "${CONFIGURATION}" >> /opt/shibboleth-idp/conf/global.xml
+echo -e "\n\n</beans>" >> /opt/shibboleth-idp/conf/global.xml
+
 sed \
     -i.bak \
     -e "s%^#idp.persistentId.sourceAttribute\s*=.*%idp.persistentId.sourceAttribute = "${PERSISTENTID_SOURCEATTRIBUTE}"%" \

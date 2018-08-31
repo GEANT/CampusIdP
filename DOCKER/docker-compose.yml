@@ -11,6 +11,8 @@ services:
         SHIBBOLETH_SCOPE:
         SHIBBOLETH_ENTITYID:
         SHIBBOLETH_HOSTNAME:
+        MYSQL_USER:
+        MYSQL_PASSWORD:
     image: shibboleth-idp
     hostname: shibboleth-idp
     volumes:
