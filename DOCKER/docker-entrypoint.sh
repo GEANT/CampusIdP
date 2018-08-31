@@ -29,11 +29,6 @@ EOF
     -Didp.keystore.password=$SHIBBOLETH_PASSWORD_KEYSTORE \
     -Didp.noprompt=true
 
-sed \
-    -i.bak \
-    's%<!-- <ref bean="c14n/SAML2Persistent" /> -->%<ref bean="c14n/SAML2Persistent" />%' \
-    /opt/shibboleth-idp/conf/c14n/subject-c14n.xml
-
 for f in /tmp/shibboleth-idp/conf/*; do
     cp $f /opt/shibboleth-idp/conf/
 done
@@ -60,6 +55,29 @@ sed \
     -e "s%^idp.authn.LDAP.bindDN\s*=.*%idp.authn.LDAP.bindDN= ${LDAP_BINDDN}%" \
     -e "s%^idp.authn.LDAP.bindDNCredential\s*=.*%idp.authn.LDAP.bindDNCredential= "${LDAP_BINDDNCREDENTIAL}"%" \
     /opt/shibboleth-idp/conf/ldap.properties
+
+sed \
+    -i.bak \
+    -e "s%^#idp.persistentId.sourceAttribute\s*=.*%idp.persistentId.sourceAttribute = "${PERSISTENTID_SOURCEATTRIBUTE}"%" \
+    -e "s%^#idp.persistentId.salt\s*=.*%idp.persistentId.salt = "${PERSISTENTID_SALT}"%" \
+    -e "s%^#idp.persistentId.generator\s*=.*%idp.persistentId.generator = shibboleth.StoredPersistentIdGenerator%" \
+    -e "s%^#idp.persistentId.dataSource\s*=.*%idp.persistentId.dataSource = shibboleth.MySQLDataSource%" \
+    /opt/shibboleth-idp/conf/saml-nameid.properties
+
+sed \
+    -i.bak \
+    -e '37d;39d' \
+    /opt/shibboleth-idp/conf/saml-nameid.xml
+
+sed \
+    -i.bak \
+    "s%^#idp.consent.StorageService\s*=.*%idp.consent.StorageService= shibboleth.JPAStorageService%" \
+    /opt/shibboleth-idp/conf/idp.properties
+
+sed \
+    -i.bak \
+    's%<!-- <ref bean="c14n/SAML2Persistent" /> -->%<ref bean="c14n/SAML2Persistent" />%' \
+    /opt/shibboleth-idp/conf/c14n/subject-c14n.xml
 
 /tmp/index.sh
 
