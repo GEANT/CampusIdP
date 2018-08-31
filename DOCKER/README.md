@@ -53,6 +53,22 @@ MYSQL_USER=shibboleth
 MYSQL_PASSWORD=miehaiph3chohghoaXah
 ```
 
+### idp.conf
+
+In this file, which is loaded automatically by `docker-compose.yml`, all "internal" configuration for IdP is defined. These variables are not required for building the image, these are required only when `docker-entrypoint.sh` is run to configure installed IdP.
+
+```
+LDAP_AUTHENTICATOR=bindSearchAuthenticator
+LDAP_LDAPURL=ldaps://ldap.example.org:636
+LDAP_USESTARTTLS=false
+LDAP_USESSL=true
+LDAP_SSLCONFIG=certificateTrust
+LDAP_BASEDN=ou=people,dc=example,dc=org
+LDAP_SUBTREESEARCH=false
+LDAP_BINDDN=uid=shibboleth,ou=special users,dc=example,dc=org
+LDAP_BINDDNCREDENTIAL=taiSh9aishaimoo7tiey
+```
+
 ### Loading variables
 
 Now you must load all the variables in the current shell.
