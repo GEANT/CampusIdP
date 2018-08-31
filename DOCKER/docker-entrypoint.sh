@@ -29,7 +29,10 @@ EOF
     -Didp.keystore.password=$SHIBBOLETH_PASSWORD_KEYSTORE \
     -Didp.noprompt=true
 
-sed -i.bak 's%<!-- <ref bean="c14n/SAML2Persistent" /> -->%<ref bean="c14n/SAML2Persistent" />%' /opt/shibboleth-idp/conf/c14n/subject-c14n.xml
+sed \
+    -i.bak \
+    's%<!-- <ref bean="c14n/SAML2Persistent" /> -->%<ref bean="c14n/SAML2Persistent" />%' \
+    /opt/shibboleth-idp/conf/c14n/subject-c14n.xml
 
 for f in /tmp/shibboleth-idp/conf/*; do
     cp $f /opt/shibboleth-idp/conf/
