@@ -67,6 +67,9 @@ LDAP_BASEDN=ou=people,dc=example,dc=org
 LDAP_SUBTREESEARCH=false
 LDAP_BINDDN=uid=shibboleth,ou=special users,dc=example,dc=org
 LDAP_BINDDNCREDENTIAL=taiSh9aishaimoo7tiey
+
+PERSISTENTID_SOURCEATTRIBUTE=uid
+PERSISTENTID_SALT=SWmGA5tfBJMI+PZHyKbp9D/CA9rw+omRcFcNw4XftbGDVduF
 ```
 
 ### Loading variables
