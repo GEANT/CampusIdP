@@ -6,16 +6,16 @@ The primary way to run this is to use `docker-compose` command, but prior to thi
 
 ## debian:stretch-slim
 
-Using `debian:stretch` official Debian Docker image produces quite a large image about 414MB. There is also `debian:stretch-slim`, however, it is only 45 MB smaller compared to `debian:stretch`. It does not make too much sense to switch to _slim_ image so we do not use it. In case you would like to switch to it anyway, change the first line of `Dockerfile` and also remember to put `mkdir -p /usr/share/man/man1` right before `apt-get install` command due to a [reported bug][].
+Using `debian:stretch` official Debian Docker image produces an image 339MB in size. There is also `debian:stretch-slim`, which is 45 MB smaller compared to `debian:stretch`. In case such saving is reasonable for you, you can switch to _slim_ image. In that case you need to change first line of `Dockerfile` and also put `mkdir -p /usr/share/man/man1` right before `apt-get install` command due to a [reported bug][].
 
 | Docker image          | Size  |
 | --------------------- | -----:|
-| `debian:stretch`      | 414MB |
-| `debian:stretch-slim` | 360MB |
+| `debian:stretch`      | 339MB |
+| `debian:stretch-slim` | 286MB |
 | `mysql:5`             | 372MB |
 | `mariadb:10.1`        | 407MB |
 
-Anyway, MySQL container for storing `persistent-id` (aka `eduPersonTargetedID` attribute) consumes _372MB_ so saving 54MB does not make any difference, sorry.
+Althoug, MySQL container for storing `persistent-id` (aka `eduPersonTargetedID` attribute) consumes _372MB_, saving 53MB could make a difference for someone.
 
 ## MySQL or MariaDB
 
