@@ -40,7 +40,6 @@ This file holds all the information required by an IdP. There are passwords most
 ```
 JETTY_VERSION=9.3.24.v20180605
 JETTY_CERT_KEY=iemooP4mu3neuPhiequi
-JETTY_CERT_PKCS12=Aihoo5aich5eetohX9oh
 
 SHIBBOLETH_VERSION=3.3.3
 SHIBBOLETH_SCOPE=idp.example.org
@@ -91,7 +90,6 @@ You can override all variables by loading a different file. You can also simply 
 ```bash
 unset JETTY_VERSION
 unset JETTY_CERT_KEY
-unset JETTY_CERT_PKCS12
 
 unset SHIBBOLETH_VERSION
 unset SHIBBOLETH_SCOPE
