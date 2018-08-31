@@ -56,6 +56,27 @@ sed \
     -e "s%^idp.authn.LDAP.bindDNCredential\s*=.*%idp.authn.LDAP.bindDNCredential= "${LDAP_BINDDNCREDENTIAL}"%" \
     /opt/shibboleth-idp/conf/ldap.properties
 
+PERSISTENTID=`cat <<EOF
+    <!-- StoredID Data Connector -->
+    <DataConnector id="myStoredId"
+        xsi:type="StoredId"
+        sourceAttributeID="${PERSISTENTID_SOURCEATTRIBUTE}"
+        generatedAttributeID="storedId"
+        salt="${PERSISTENTID_SALT}"
+        queryTimeout="0">
+    <Dependency ref="uid" />
+    <BeanManagedConnection>shibboleth.MySQLDataSource</BeanManagedConnection>
+    </DataConnector>
+EOF
+`
+sed \
+    -i.bak \
+    '$d' \
+    /opt/shibboleth-idp/conf/attribute-resolver.xml
+
+echo "${PERSISTENTID}" >> /opt/shibboleth-idp/conf/attribute-resolver.xml
+echo -e "\n\n</AttributeResolver>" >> /opt/shibboleth-idp/conf/attribute-resolver.xml
+
 CONFIGURATION=`cat <<EOF
 <bean id="shibboleth.MySQLDataSource"
     class="org.apache.commons.dbcp2.BasicDataSource"
