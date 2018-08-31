@@ -6,16 +6,18 @@ The primary way to run this is to use `docker-compose` command, but prior to thi
 
 ## debian:stretch-slim
 
-Using `debian:stretch` official Debian Docker image produces quite a large image about 414MB. There is also `debian:stretch-slim`, however, it is only 45 MB smaller compared to `debian:stretch`. It does not make too much sense to switch to _slim_ image so we do not use it. In case you would like to switch to it anyway, change the first line of `Dockerfile` and also remember to put `mkdir -p /usr/share/man/man1` right before `apt-get install` command due to a [reported bug][].
+Using `debian:stretch` official Debian Docker image produces an image 339MB in size. There is also `debian:stretch-slim`, which is 45 MB smaller compared to `debian:stretch`. In case such saving is reasonable for you, you can switch to _slim_ image. In that case you need to change first line of `Dockerfile` and also put `mkdir -p /usr/share/man/man1` right before `apt-get install` command due to a [reported bug][].
 
 | Docker image          | Size  |
 | --------------------- | -----:|
-| `debian:stretch`      | 414MB |
-| `debian:stretch-slim` | 360MB |
+| `debian:stretch`      | 339MB |
+| `debian:stretch-slim` | 286MB |
 | `mysql:5`             | 372MB |
 | `mariadb:10.1`        | 407MB |
 
-Anyway, MySQL container for storing `persistent-id` (aka `eduPersonTargetedID` attribute) consumes _372MB_ so saving 54MB does not make any difference, sorry.
+Althoug, MySQL container for storing `persistent-id` (aka `eduPersonTargetedID` attribute) consumes _372MB_, saving 53MB could make a difference for someone.
+
+It could be saved 48MB by deleting `/opt/shibboleth-identity-provider-$SHIBBOLETH_VERSION/` directory which is not neccessary after it has been installed using `install.sh` script. However, that assumes the installation is run from the `Dockerfile` not `docker-entrypoint.sh`. And I am sure it is not worth it.
 
 ## MySQL or MariaDB
 
@@ -38,7 +40,6 @@ This file holds all the information required by an IdP. There are passwords most
 ```
 JETTY_VERSION=9.3.24.v20180605
 JETTY_CERT_KEY=iemooP4mu3neuPhiequi
-JETTY_CERT_PKCS12=Aihoo5aich5eetohX9oh
 
 SHIBBOLETH_VERSION=3.3.3
 SHIBBOLETH_SCOPE=idp.example.org
@@ -50,6 +51,25 @@ MYSQL_ROOT_PASSWORD=shie9aez5Ahzakah9aen
 MYSQL_DATABASE=shibboleth
 MYSQL_USER=shibboleth
 MYSQL_PASSWORD=miehaiph3chohghoaXah
+```
+
+### idp.conf
+
+In this file, which is loaded automatically by `docker-compose.yml`, all "internal" configuration for IdP is defined. These variables are not required for building the image, these are required only when `docker-entrypoint.sh` is run to configure installed IdP.
+
+```
+LDAP_AUTHENTICATOR=bindSearchAuthenticator
+LDAP_LDAPURL=ldaps://ldap.example.org:636
+LDAP_USESTARTTLS=false
+LDAP_USESSL=true
+LDAP_SSLCONFIG=certificateTrust
+LDAP_BASEDN=ou=people,dc=example,dc=org
+LDAP_SUBTREESEARCH=false
+LDAP_BINDDN=uid=shibboleth,ou=special users,dc=example,dc=org
+LDAP_BINDDNCREDENTIAL=taiSh9aishaimoo7tiey
+
+PERSISTENTID_SOURCEATTRIBUTE=uid
+PERSISTENTID_SALT=SWmGA5tfBJMI+PZHyKbp9D/CA9rw+omRcFcNw4XftbGDVduF
 ```
 
 ### Loading variables
@@ -89,7 +109,6 @@ You can override all variables by loading a different file. You can also simply 
 ```bash
 unset JETTY_VERSION
 unset JETTY_CERT_KEY
-unset JETTY_CERT_PKCS12
 
 unset SHIBBOLETH_VERSION
 unset SHIBBOLETH_SCOPE

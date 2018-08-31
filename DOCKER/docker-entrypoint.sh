@@ -2,7 +2,7 @@
 
 set -e
 
-/tmp/jetty-keystore.sh $JETTY_VERSION $JETTY_CERT_KEY $JETTY_CERT_PKCS12 $SHIBBOLETH_HOSTNAME
+/tmp/jetty-keystore.sh $JETTY_VERSION $JETTY_CERT_KEY $SHIBBOLETH_HOSTNAME
 
 SHIBBOLETH_PASSWORD_SEALER=`tr -cd '[:alnum:]' < /dev/urandom | fold -w30 | head -n1`
 SHIBBOLETH_PASSWORD_KEYSTORE=`tr -cd '[:alnum:]' < /dev/urandom | fold -w30 | head -n1`
@@ -29,11 +29,6 @@ EOF
     -Didp.keystore.password=$SHIBBOLETH_PASSWORD_KEYSTORE \
     -Didp.noprompt=true
 
-cd /opt/shibboleth-idp && \
-    /tmp/shibboleth-rebuild.expect
-
-sed -i.bak 's%<!-- <ref bean="c14n/SAML2Persistent" /> -->%<ref bean="c14n/SAML2Persistent" />%' /opt/shibboleth-idp/conf/c14n/subject-c14n.xml
-
 for f in /tmp/shibboleth-idp/conf/*; do
     cp $f /opt/shibboleth-idp/conf/
 done
@@ -47,6 +42,80 @@ sed \
     -e "s/idp\.sealer\.storePassword\=\s*.*/idp.sealer.storePassword= ${SHIBBOLETH_PASSWORD_SEALER}/" \
     -e "s/idp\.sealer\.keyPassword\=\s*.*/idp.sealer.keyPassword= ${SHIBBOLETH_PASSWORD_SEALER}/" \
     /opt/shibboleth-idp/conf/idp.properties
+
+sed \
+    -i.bak \
+    -e "s%^#idp.authn.LDAP.authenticator\s*=.*%idp.authn.LDAP.authenticator= "${LDAP_AUTHENTICATOR}"%" \
+    -e "s%^idp.authn.LDAP.ldapURL\s*=.*%idp.authn.LDAP.ldapURL= "${LDAP_LDAPURL}"%" \
+    -e "s%^#idp.authn.LDAP.useStartTLS\s*=.*%idp.authn.LDAP.useStartTLS= "${LDAP_USESTARTTLS}"%" \
+    -e "s%^#idp.authn.LDAP.useSSL\s*=.*%idp.authn.LDAP.useSSL= "${LDAP_USESSL}"%" \
+    -e "s%^#idp.authn.LDAP.sslConfig\s*=.*%idp.authn.LDAP.sslConfig= "${LDAP_SSLCONFIG}"%" \
+    -e "s%^idp.authn.LDAP.baseDN\s*=.*%idp.authn.LDAP.baseDN= "${LDAP_BASEDN}"%" \
+    -e "s%^#idp.authn.LDAP.subtreeSearch\s*=.*%idp.authn.LDAP.subtreeSearch= "${LDAP_SUBTREESEARCH}"%" \
+    -e "s%^idp.authn.LDAP.bindDN\s*=.*%idp.authn.LDAP.bindDN= ${LDAP_BINDDN}%" \
+    -e "s%^idp.authn.LDAP.bindDNCredential\s*=.*%idp.authn.LDAP.bindDNCredential= "${LDAP_BINDDNCREDENTIAL}"%" \
+    /opt/shibboleth-idp/conf/ldap.properties
+
+CONFIGURATION=`cat <<EOF
+<bean id="shibboleth.MySQLDataSource"
+    class="org.apache.commons.dbcp2.BasicDataSource"
+    p:driverClassName="com.mysql.jdbc.Driver"
+    p:url="jdbc:mysql://db:3306/shibboleth"
+    p:username="${MYSQL_USER}"
+    p:password="${MYSQL_PASSWORD}" />
+
+<bean id="shibboleth.JPAStorageService"
+    class="org.opensaml.storage.impl.JPAStorageService"
+    p:cleanupInterval="%{idp.storage.cleanupInterval:PT10M}"
+    c:factory-ref="shibboleth.JPAStorageService.entityManagerFactory" />
+
+<bean id="shibboleth.JPAStorageService.entityManagerFactory"
+    class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+    <property name="packagesToScan" value="org.opensaml.storage.impl"/>
+    <property name="dataSource" ref="shibboleth.MySQLDataSource"/>
+    <property name="jpaVendorAdapter" ref="shibboleth.JPAStorageService.JPAVendorAdapter"/>
+    <property name="jpaDialect">
+        <bean class="org.springframework.orm.jpa.vendor.HibernateJpaDialect" />
+    </property>
+</bean>
+
+<bean id="shibboleth.JPAStorageService.JPAVendorAdapter"
+    class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter"
+    p:generateDdl="true"
+    p:database="MYSQL"
+    p:databasePlatform="org.hibernate.dialect.MySQL5Dialect" />
+EOF
+`
+sed \
+    -i.bak \
+    '$d' \
+    /opt/shibboleth-idp/conf/global.xml
+
+echo "${CONFIGURATION}" >> /opt/shibboleth-idp/conf/global.xml
+echo -e "\n\n</beans>" >> /opt/shibboleth-idp/conf/global.xml
+
+sed \
+    -i.bak \
+    -e "s%^#idp.persistentId.sourceAttribute\s*=.*%idp.persistentId.sourceAttribute = "${PERSISTENTID_SOURCEATTRIBUTE}"%" \
+    -e "s%^#idp.persistentId.salt\s*=.*%idp.persistentId.salt = "${PERSISTENTID_SALT}"%" \
+    -e "s%^#idp.persistentId.generator\s*=.*%idp.persistentId.generator = shibboleth.StoredPersistentIdGenerator%" \
+    -e "s%^#idp.persistentId.dataSource\s*=.*%idp.persistentId.dataSource = shibboleth.MySQLDataSource%" \
+    /opt/shibboleth-idp/conf/saml-nameid.properties
+
+sed \
+    -i.bak \
+    -e '37d;39d' \
+    /opt/shibboleth-idp/conf/saml-nameid.xml
+
+sed \
+    -i.bak \
+    "s%^#idp.consent.StorageService\s*=.*%idp.consent.StorageService= shibboleth.JPAStorageService%" \
+    /opt/shibboleth-idp/conf/idp.properties
+
+sed \
+    -i.bak \
+    's%<!-- <ref bean="c14n/SAML2Persistent" /> -->%<ref bean="c14n/SAML2Persistent" />%' \
+    /opt/shibboleth-idp/conf/c14n/subject-c14n.xml
 
 /tmp/index.sh
 

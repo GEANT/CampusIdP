@@ -1,16 +1,18 @@
 version: '3.6'
 services:
   idp:
+    env_file: conf/${SHIBBOLETH_HOSTNAME}/idp.conf
     build:
       context: .
       args:
         JETTY_VERSION:
         JETTY_CERT_KEY:
-        JETTY_CERT_PKCS12:
         SHIBBOLETH_VERSION:
         SHIBBOLETH_SCOPE:
         SHIBBOLETH_ENTITYID:
         SHIBBOLETH_HOSTNAME:
+        MYSQL_USER:
+        MYSQL_PASSWORD:
     image: shibboleth-idp
     hostname: shibboleth-idp
     volumes:

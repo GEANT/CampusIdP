@@ -19,7 +19,8 @@ ENV JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64/jre \
 
 COPY gpg/ /root/gpg/
 RUN gpg -q --import /root/gpg/joakim.erdfelt_gmail.com.key && \
-    gpg -q --import /root/gpg/tzeller_dragonacea.biz.key
+    gpg -q --import /root/gpg/tzeller_dragonacea.biz.key && \
+    rm -rf /root/gpg/
 
 RUN groupadd idp && \
     useradd -m -g idp -s /bin/bash idp && \
@@ -46,7 +47,9 @@ RUN groupadd idp && \
     cp /opt/src/mysql-connector-java-5.1.39/mysql-connector-java-5.1.39-bin.jar /opt/jetty/lib/ext && \
     mkdir -p /opt/jetty/webapps/root && \
     echo etc/tweak-ssl.xml >> /opt/jetty/start.d/https.ini && \
-    chown -R idp:idp /opt/jetty/ /opt/jetty-distribution*/
+    chown -R idp:idp /opt/jetty/ /opt/jetty-distribution*/ && \
+    rm -rf /opt/src/jetty-distribution-$JETTY_VERSION.tar.* \
+           /opt/src/mysql-connector-java-5.1.39*
 
 COPY conf/common/jetty/idp.xml /opt/jetty/webapps
 COPY conf/common/jetty/tweak-ssl.xml /opt/jetty/etc
@@ -56,19 +59,22 @@ RUN wget -q -P /opt/src/ https://shibboleth.net/downloads/identity-provider/$SHI
                          https://shibboleth.net/downloads/identity-provider/$SHIBBOLETH_VERSION/shibboleth-identity-provider-$SHIBBOLETH_VERSION.tar.gz.sha256 && \
     cd /opt/src && sha256sum -c shibboleth-identity-provider-$SHIBBOLETH_VERSION.tar.gz.sha256 && \
     gpg -q --verify /opt/src/shibboleth-identity-provider-$SHIBBOLETH_VERSION.tar.gz.asc && \
-    tar -xzf /opt/src/shibboleth-identity-provider-$SHIBBOLETH_VERSION.tar.gz -C /opt
+    tar -xzf /opt/src/shibboleth-identity-provider-$SHIBBOLETH_VERSION.tar.gz -C /opt && \
+    rm -rf /opt/src/
 
 ARG JETTY_CERT_KEY
-ARG JETTY_CERT_PKCS12
-ENV JETTY_CERT_KEY=$JETTY_CERT_KEY \
-    JETTY_CERT_PKCS12=$JETTY_CERT_PKCS12
+ENV JETTY_CERT_KEY=$JETTY_CERT_KEY
 
 ARG SHIBBOLETH_SCOPE
 ARG SHIBBOLETH_ENTITYID
 ARG SHIBBOLETH_HOSTNAME
+ARG MYSQL_USER
+ARG MYSQL_PASSWORD
 ENV SHIBBOLETH_SCOPE=$SHIBBOLETH_SCOPE \
     SHIBBOLETH_ENTITYID=$SHIBBOLETH_ENTITYID \
-    SHIBBOLETH_HOSTNAME=$SHIBBOLETH_HOSTNAME
+    SHIBBOLETH_HOSTNAME=$SHIBBOLETH_HOSTNAME \
+    MYSQL_USER=$MYSQL_USER \
+    MYSQL_PASSWORD=$MYSQL_PASSWORD
 
 COPY conf/common/scripts/ /tmp/
 COPY docker-entrypoint.sh /
@@ -76,5 +82,4 @@ COPY docker-entrypoint.sh /
 EXPOSE 8080 8443
 
 ENTRYPOINT ["./docker-entrypoint.sh"]
-CMD ["${JETTY_VERSION}"]
 
