@@ -20,9 +20,7 @@ services:
       - idp-credentials:/opt/shibboleth-idp/credentials
       - idp-edit-webapp:/opt/shibboleth-idp/edit-webapp
       - idp-logs:/opt/shibboleth-idp/logs
-      - idp-metadata:/opt/shibboleth-idp/metadata
       - idp-views:/opt/shibboleth-idp/views
-      - idp-war:/opt/shibboleth-idp/war
       - jetty-logs:/opt/jetty/logs
       - ./conf/${SHIBBOLETH_HOSTNAME}/shibboleth-idp/conf:/tmp/shibboleth-idp/conf
       - ./conf/${SHIBBOLETH_HOSTNAME}/shibboleth-idp/credentials:/tmp/shibboleth-idp/credentials
@@ -50,8 +48,6 @@ volumes:
   idp-credentials:
   idp-edit-webapp:
   idp-logs:
-  idp-metadata:
   idp-views:
-  idp-war:
   jetty-logs:
   db-data:
