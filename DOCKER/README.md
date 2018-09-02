@@ -70,6 +70,27 @@ LDAP_BINDDNCREDENTIAL=taiSh9aishaimoo7tiey
 
 PERSISTENTID_SOURCEATTRIBUTE=uid
 PERSISTENTID_SALT=SWmGA5tfBJMI+PZHyKbp9D/CA9rw+omRcFcNw4XftbGDVduF
+
+UIINFO_DISPLAYNAME_EN=ORGANIZATION
+UIINFO_DISPLAYNAME_CS=ORGANIZACE
+UIINFO_DESCRIPTION_EN=Identity Provider for ORGANIZATION employees.
+UIINFO_DESCRIPTION_CS=Poskytovatel identity pro zaměstnance ORGANIZACE.
+UIINFO_INFORMATIONURL_EN=https://www.example.org/en
+UIINFO_INFORMATIONURL_CS=https://www.example.org/cs
+UIINFO_LOGO=https://idp.example.org/idp/images/logo.png
+UIINFO_LOGO_WIDTH=100
+UIINFO_LOGO_HEIGHT=50
+
+ORGANIZATION_NAME_EN=ORGANIZATION
+ORGANIZATION_NAME_CS=ORGANIZACE
+ORGANIZATION_DISPLAYNAME_EN=ORGANIZATION
+ORGANIZATION_DISPLAYNAME_CS=ORGANIZACE
+ORGANIZATION_URL_EN=https://www.example.org/en
+ORGANIZATION_URL_CS=https://www.example.org/cs
+
+CONTACTPERSON_GIVENNAME=John
+CONTACTPERSON_SURNAME=Doe
+CONTACTPERSON_EMAIL=john.doe@example.org
 ```
 
 ### Loading variables
@@ -77,7 +98,7 @@ PERSISTENTID_SALT=SWmGA5tfBJMI+PZHyKbp9D/CA9rw+omRcFcNw4XftbGDVduF
 Now you must load all the variables in the current shell.
 
 ```bash
-export $(cat conf/idp.example.org/env.conf | xargs)
+export `cat conf/idp.example.org/env.conf`
 ```
 
 ### Start your IdP

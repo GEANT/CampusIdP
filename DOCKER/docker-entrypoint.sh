@@ -56,6 +56,27 @@ sed \
     -e "s%^idp.authn.LDAP.bindDNCredential\s*=.*%idp.authn.LDAP.bindDNCredential= "${LDAP_BINDDNCREDENTIAL}"%" \
     /opt/shibboleth-idp/conf/ldap.properties
 
+PERSISTENTID=`cat <<EOF
+    <!-- StoredID Data Connector -->
+    <DataConnector id="myStoredId"
+        xsi:type="StoredId"
+        sourceAttributeID="${PERSISTENTID_SOURCEATTRIBUTE}"
+        generatedAttributeID="storedId"
+        salt="${PERSISTENTID_SALT}"
+        queryTimeout="0">
+    <Dependency ref="uid" />
+    <BeanManagedConnection>shibboleth.MySQLDataSource</BeanManagedConnection>
+    </DataConnector>
+EOF
+`
+sed \
+    -i.bak \
+    '$d' \
+    /opt/shibboleth-idp/conf/attribute-resolver.xml
+
+echo "${PERSISTENTID}" >> /opt/shibboleth-idp/conf/attribute-resolver.xml
+echo -e "\n\n</AttributeResolver>" >> /opt/shibboleth-idp/conf/attribute-resolver.xml
+
 CONFIGURATION=`cat <<EOF
 <bean id="shibboleth.MySQLDataSource"
     class="org.apache.commons.dbcp2.BasicDataSource"
@@ -116,6 +137,66 @@ sed \
     -i.bak \
     's%<!-- <ref bean="c14n/SAML2Persistent" /> -->%<ref bean="c14n/SAML2Persistent" />%' \
     /opt/shibboleth-idp/conf/c14n/subject-c14n.xml
+
+UIINFO=`cat <<EOF
+            <mdui:UIInfo>
+                <mdui:DisplayName xml:lang="en">${UIINFO_DISPLAYNAME_EN}</mdui:DisplayName>
+                <mdui:DisplayName xml:lang="cs">${UIINFO_DISPLAYNAME_CS}</mdui:DisplayName>
+                <mdui:Description xml:lang="en">${UIINFO_DESCRIPTION_EN}</mdui:Description>
+                <mdui:Description xml:lang="cs">${UIINFO_DESCRIPTION_CS}</mdui:Description>
+                <mdui:InformationURL xml:lang="en">${UIINFO_INFORMATIONURL_EN}</mdui:InformationURL>
+                <mdui:InformationURL xml:lang="cs">${UIINFO_INFORMATIONURL_CS}</mdui:InformationURL>
+                <mdui:Logo width="${UIINFO_LOGO_WIDTH}" height="${UIINFO_LOGO_HEIGHT}">${UIINFO_LOGO}</mdui:Logo>
+            </mdui:UIInfo>
+EOF
+`
+
+ORGANIZATION=`cat <<EOF
+<Organization>
+    <OrganizationName xml:lang="en">${ORGANIZATION_NAME_EN}</OrganizationName>
+    <OrganizationName xml:lang="cs">${ORGANIZATION_NAME_CS}</OrganizationName>
+    <OrganizationDisplayName xml:lang="en">${ORGANIZATION_DISPLAYNAME_EN}</OrganizationDisplayName>
+    <OrganizationDisplayName xml:lang="cs">${ORGANIZATION_DISPLAYNAME_CS}</OrganizationDisplayName>
+    <OrganizationURL xml:lang="en">${ORGANIZATION_URL_EN}</OrganizationURL>
+    <OrganizationURL xml:lang="cs">${ORGANIZATION_URL_CS}</OrganizationURL>
+</Organization>
+EOF
+`
+
+CONTACTPERSON=`cat <<EOF
+<ContactPerson contactType="technical">
+    <GivenName>${CONTACTPERSON_GIVENNAME}</GivenName>
+    <SurName>${CONTACTPERSON_SURNAME}</SurName>
+    <EmailAddress>mailto:${CONTACTPERSON_EMAIL}</EmailAddress>
+</ContactPerson>
+EOF
+`
+
+sed \
+    -i.bak \
+    -e '2,7d;14,22d' \
+    /opt/shibboleth-idp/metadata/idp-metadata.xml
+
+ed -s /opt/shibboleth-idp/metadata/idp-metadata.xml <<EOF
+8i
+${UIINFO}
+.
+wq
+EOF
+
+ed -s /opt/shibboleth-idp/metadata/idp-metadata.xml <<EOF
+207i
+${ORGANIZATION}
+.
+wq
+EOF
+
+ed -s /opt/shibboleth-idp/metadata/idp-metadata.xml <<EOF
+215i
+${CONTACTPERSON}
+.
+wq
+EOF
 
 /tmp/index.sh
 

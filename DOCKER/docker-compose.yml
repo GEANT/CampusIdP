@@ -16,7 +16,12 @@ services:
     image: shibboleth-idp
     hostname: shibboleth-idp
     volumes:
-      - idp-data:/opt
+      - idp-conf:/opt/shibboleth-idp/conf
+      - idp-credentials:/opt/shibboleth-idp/credentials
+      - idp-edit-webapp:/opt/shibboleth-idp/edit-webapp
+      - idp-logs:/opt/shibboleth-idp/logs
+      - idp-views:/opt/shibboleth-idp/views
+      - jetty-logs:/opt/jetty/logs
       - ./conf/${SHIBBOLETH_HOSTNAME}/shibboleth-idp/conf:/tmp/shibboleth-idp/conf
       - ./conf/${SHIBBOLETH_HOSTNAME}/shibboleth-idp/credentials:/tmp/shibboleth-idp/credentials
       - ./conf/${SHIBBOLETH_HOSTNAME}/jetty:/tmp/jetty
@@ -39,5 +44,10 @@ services:
       MYSQL_PASSWORD:
 
 volumes:
-  idp-data:
+  idp-conf:
+  idp-credentials:
+  idp-edit-webapp:
+  idp-logs:
+  idp-views:
+  jetty-logs:
   db-data:
