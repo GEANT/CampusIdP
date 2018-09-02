@@ -6,6 +6,7 @@ RUN apt-get -qq update && \
     apt-get -qq -y --no-install-recommends install \
         wget \
         expect \
+        ed \
         openjdk-8-jre-headless \
         gnupg2 \
         dirmngr && \
