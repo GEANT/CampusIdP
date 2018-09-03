@@ -125,8 +125,10 @@ docker-compose -p example down
 To stop and delete running container, delete all built images and data volumes, run the following command:
 
 ```bash
-docker-compose -p example down --rmi all -v --remove-orphans
+docker-compose -p example down --rmi local -v --remove-orphans
 ```
+
+Using `all` argument for `--rmi` option would delete even images downloaded from internet. You do not want to use that since it just waste bandwidth on both sided.
 
 You can override all variables by loading a different file. You can also simply unset variables or even simpler close the current shell.
 
