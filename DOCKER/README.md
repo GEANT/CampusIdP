@@ -29,13 +29,14 @@ Although the current `docker-compose.yml` deploys MySQL (`mysql:5`), it has been
     hostname: mariadb
 ```
 
-## Run an IdP
+## Configure an IdP
 
-As the first step, you have to prepare `env.conf` file. You should not touch `JETTY_VERSION` and `SHIBBOLETH_VERSION` variables unless you know what you are doing.
+Prior to running an IdP, two configuration files must be prepared.
 
 ### env.conf
 
-This file holds all the information required by an IdP. There are passwords mostly, however, you can define _scope_ and _entityID_ for the IdP etc.
+This file holds all the information required by an IdP. There are passwords mostly, however, you can define _scope_ and _entityID_ for the IdP etc. You should not touch `JETTY_VERSION` and `SHIBBOLETH_VERSION` variables unless you know what you are doing.
+
 
 ```
 JETTY_VERSION=9.3.24.v20180605
@@ -92,6 +93,8 @@ CONTACTPERSON_GIVENNAME=John
 CONTACTPERSON_SURNAME=Doe
 CONTACTPERSON_EMAIL=john.doe@example.org
 ```
+
+## Run an IdP
 
 ### Loading variables
 
