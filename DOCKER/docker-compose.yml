@@ -3,16 +3,9 @@ services:
   idp:
     env_file:
       - conf/${SHIBBOLETH_HOSTNAME}/idp.conf
-      - conf/${SHIBBOLETH_HOSTNAME}/mysql.conf
+      - conf/${SHIBBOLETH_HOSTNAME}/db.conf
     build:
       context: .
-      args:
-        JETTY_CERT_KEY:
-        SHIBBOLETH_SCOPE:
-        SHIBBOLETH_ENTITYID:
-        SHIBBOLETH_HOSTNAME:
-        MYSQL_USER:
-        MYSQL_PASSWORD:
     image: shibboleth-idp
     hostname: shibboleth-idp
     volumes:
@@ -31,18 +24,13 @@ services:
     depends_on:
       - db
   db:
-    env_file: conf/${SHIBBOLETH_HOSTNAME}/mysql.conf
+    env_file: conf/${SHIBBOLETH_HOSTNAME}/db.conf
     image: mysql:5
     hostname: mysql
     volumes:
       - ./mysql/db:/docker-entrypoint-initdb.d
       - ./mysql/conf:/etc/mysql/conf.d
       - db-data:/var/lib/mysql
-    environment:
-      MYSQL_ROOT_PASSWORD:
-      MYSQL_DATABASE:
-      MYSQL_USER:
-      MYSQL_PASSWORD:
 
 volumes:
   idp-conf:
