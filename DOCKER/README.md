@@ -33,32 +33,20 @@ Although the current `docker-compose.yml` deploys MySQL (`mysql:5`), it has been
 
 Prior to running an IdP, two configuration files must be prepared.
 
-### env.conf
-
-This file holds all the information required by an IdP. There are passwords mostly, however, you can define _scope_ and _entityID_ for the IdP etc. You should not touch `JETTY_VERSION` and `SHIBBOLETH_VERSION` variables unless you know what you are doing.
-
-
-```
-JETTY_VERSION=9.3.24.v20180605
-JETTY_CERT_KEY=iemooP4mu3neuPhiequi
-
-SHIBBOLETH_VERSION=3.3.3
-SHIBBOLETH_SCOPE=idp.example.org
-SHIBBOLETH_ENTITYID=https://idp.example.org/idp/shibboleth
-SHIBBOLETH_HOSTNAME=idp.example.org
-SHIBBOLETH_PID_SALT=ceek9xa0Ahmoh0uyiwah
-
-MYSQL_ROOT_PASSWORD=shie9aez5Ahzakah9aen
-MYSQL_DATABASE=shibboleth
-MYSQL_USER=shibboleth
-MYSQL_PASSWORD=miehaiph3chohghoaXah
-```
+FIXME: `JETTY_VERSION` and `SHIBBOLETH_VERSION`.
 
 ### idp.conf
 
-In this file, which is loaded automatically by `docker-compose.yml`, all "internal" configuration for IdP is defined. These variables are not required for building the image, these are required only when `docker-entrypoint.sh` is run to configure installed IdP.
+In this file, which is loaded automatically by `docker-compose.yml`, all "internal" configuration for the IdP itself is defined. These variables are not required for building the image, these are required only when `docker-entrypoint.sh` is run to configure installed IdP. There are various passwords mostly, however, you can define _scope_ and _entityID_ for the IdP etc.
+
 
 ```
+JETTY_CERT_KEY=iemooP4mu3neuPhiequi
+
+SHIBBOLETH_SCOPE=idp.example.org
+SHIBBOLETH_ENTITYID=https://idp.example.org/idp/shibboleth
+SHIBBOLETH_HOSTNAME=idp.example.org
+
 LDAP_AUTHENTICATOR=bindSearchAuthenticator
 LDAP_LDAPURL=ldaps://ldap.example.org:636
 LDAP_USESTARTTLS=false
@@ -94,22 +82,27 @@ CONTACTPERSON_SURNAME=Doe
 CONTACTPERSON_EMAIL=john.doe@example.org
 ```
 
+### db.conf
+
+This file contains all database stuff, such as root password, database name, etc. Database is used for storing attribute release consents and computed persistent-ids.
+
+```
+MYSQL_ROOT_PASSWORD=shie9aez5Ahzakah9aen
+MYSQL_DATABASE=shibboleth
+MYSQL_USER=shibboleth
+MYSQL_PASSWORD=miehaiph3chohghoaXah
+```
+
 ## Run an IdP
 
-### Loading variables
-
-Now you must load all the variables in the current shell.
-
-```bash
-export `cat conf/idp.example.org/env.conf`
-```
+In order to run an IdP a variable $HOST must be defined and its value is expected to be the subdirectory name under `conf/` directory where all configuration (IdP and database) is defined. Either `export HOST` variable or type `HOST` variable at the beginning of `docker-compose` command.
 
 ### Start your IdP
 
-And now it is possible to run `docker-compose` command. It is a very good idea to specifi "a project name" using `-p` parameter. I would use domain name or server host name as a value.
+Now it is possible to run `docker-compose` command. It is a very good idea to specify "a project name" using `-p` parameter. I would use domain name or server host name as a value.
 
 ```bash
-docker-compose -p example up -d --build
+HOST=idp.example.org docker-compose -p example up -d --build
 ```
 
 ## Stop an IdP
@@ -129,24 +122,6 @@ docker-compose -p example down --rmi local -v --remove-orphans
 ```
 
 Using `all` argument for `--rmi` option would delete even images downloaded from internet. You do not want to use that since it just waste bandwidth on both sided.
-
-You can override all variables by loading a different file. You can also simply unset variables or even simpler close the current shell.
-
-```bash
-unset JETTY_VERSION
-unset JETTY_CERT_KEY
-
-unset SHIBBOLETH_VERSION
-unset SHIBBOLETH_SCOPE
-unset SHIBBOLETH_ENTITYID
-unset SHIBBOLETH_HOSTNAME
-unset SHIBBOLETH_PID_SALT
-
-unset MYSQL_ROOT_PASSWORD
-unset MYSQL_DATABASE
-unset MYSQL_USER
-unset MYSQL_PASSWORD
-```
 
 [reported bug]: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=863199
 
