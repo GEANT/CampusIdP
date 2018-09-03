@@ -26,7 +26,7 @@ HEADER="$(cat <<EOF
                 <div class="jumbotron text-center">
                     <h1>Indentity Provider </h1>
                     <p>of</p>
-                    <h2>CESNET</h2>
+                    <h2>${UIINFO_DISPLAYNAME_EN}</h2>
             </div>
 
         </div>
@@ -35,7 +35,7 @@ HEADER="$(cat <<EOF
     <div class="row">
         <div class="col-md-12">
 
-            <p>This is an Identity Provider for <em>CESNET</em> running <a
+            <p>This is an Identity Provider for <em>${UIINFO_DISPLAYNAME_EN}</em> running <a
             href="https://www.shibboleth.net/products/identity-provider/">Shibboleth
             Identity Provider</a> inside a Docker container. It is a live
             implementation of <em>GÉANT</em> project called <em>Campus
@@ -43,12 +43,12 @@ HEADER="$(cat <<EOF
 
             <h2>Technical Information</h2>
             <p>To register this Identity Provider to a federation, use this <a
-            href="/idp/metadata">metadata</a>, however, be careful as it might
+            href="/idp/shibboleth">metadata</a>, however, be careful as it might
             be needed to tweak it a little bit depending on federation's
             policy.</p>
             <p>In case of any technical issues with this IdP, contact <a
-            href="mailto:jan.oppolzer@cesnet.cz">Jan Oppolzer</a> of <a
-            href="https://www.cesnet.cz/">CESNET</a>.</p>
+            href="mailto:${CONTACTPERSON_EMAIL}">${CONTACTPERSON_GIVENNAME} ${CONTACTPERSON_SURNAME}</a> of <a
+            href="${ORGANIZATION_URL_EN}">${ORGANIZATION_DISPLAYNAME_EN}</a>.</p>
 
             <h2>Available Attributes</h2>
             <p>This Identity Provider implements attributes listed in the table

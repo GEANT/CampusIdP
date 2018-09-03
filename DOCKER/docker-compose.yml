@@ -1,18 +1,11 @@
 version: '3.6'
 services:
   idp:
-    env_file: conf/${SHIBBOLETH_HOSTNAME}/idp.conf
+    env_file:
+      - conf/${HOST}/idp.conf
+      - conf/${HOST}/db.conf
     build:
       context: .
-      args:
-        JETTY_VERSION:
-        JETTY_CERT_KEY:
-        SHIBBOLETH_VERSION:
-        SHIBBOLETH_SCOPE:
-        SHIBBOLETH_ENTITYID:
-        SHIBBOLETH_HOSTNAME:
-        MYSQL_USER:
-        MYSQL_PASSWORD:
     image: shibboleth-idp
     hostname: shibboleth-idp
     volumes:
@@ -22,26 +15,22 @@ services:
       - idp-logs:/opt/shibboleth-idp/logs
       - idp-views:/opt/shibboleth-idp/views
       - jetty-logs:/opt/jetty/logs
-      - ./conf/${SHIBBOLETH_HOSTNAME}/shibboleth-idp/conf:/tmp/shibboleth-idp/conf
-      - ./conf/${SHIBBOLETH_HOSTNAME}/shibboleth-idp/credentials:/tmp/shibboleth-idp/credentials
-      - ./conf/${SHIBBOLETH_HOSTNAME}/jetty:/tmp/jetty
+      - ./conf/${HOST}/shibboleth-idp/conf:/tmp/shibboleth-idp/conf
+      - ./conf/${HOST}/shibboleth-idp/credentials:/tmp/shibboleth-idp/credentials
+      - ./conf/${HOST}/jetty:/tmp/jetty
     ports:
       - 9080:8080
       - 9443:8443
     depends_on:
       - db
   db:
+    env_file: conf/${HOST}/db.conf
     image: mysql:5
     hostname: mysql
     volumes:
       - ./mysql/db:/docker-entrypoint-initdb.d
       - ./mysql/conf:/etc/mysql/conf.d
       - db-data:/var/lib/mysql
-    environment:
-      MYSQL_ROOT_PASSWORD:
-      MYSQL_DATABASE:
-      MYSQL_USER:
-      MYSQL_PASSWORD:
 
 volumes:
   idp-conf:

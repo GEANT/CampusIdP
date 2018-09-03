@@ -12,8 +12,8 @@ RUN apt-get -qq update && \
         dirmngr && \
     rm -rf /var/lib/apt/lists/*
 
-ARG JETTY_VERSION
-ARG SHIBBOLETH_VERSION
+ARG JETTY_VERSION=9.3.24.v20180605
+ARG SHIBBOLETH_VERSION=3.3.3
 ENV JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64/jre \
     JETTY_VERSION=$JETTY_VERSION \
     SHIBBOLETH_VERSION=$SHIBBOLETH_VERSION
@@ -62,20 +62,6 @@ RUN wget -q -P /opt/src/ https://shibboleth.net/downloads/identity-provider/$SHI
     gpg -q --verify /opt/src/shibboleth-identity-provider-$SHIBBOLETH_VERSION.tar.gz.asc && \
     tar -xzf /opt/src/shibboleth-identity-provider-$SHIBBOLETH_VERSION.tar.gz -C /opt && \
     rm -rf /opt/src/
-
-ARG JETTY_CERT_KEY
-ENV JETTY_CERT_KEY=$JETTY_CERT_KEY
-
-ARG SHIBBOLETH_SCOPE
-ARG SHIBBOLETH_ENTITYID
-ARG SHIBBOLETH_HOSTNAME
-ARG MYSQL_USER
-ARG MYSQL_PASSWORD
-ENV SHIBBOLETH_SCOPE=$SHIBBOLETH_SCOPE \
-    SHIBBOLETH_ENTITYID=$SHIBBOLETH_ENTITYID \
-    SHIBBOLETH_HOSTNAME=$SHIBBOLETH_HOSTNAME \
-    MYSQL_USER=$MYSQL_USER \
-    MYSQL_PASSWORD=$MYSQL_PASSWORD
 
 COPY conf/common/scripts/ /tmp/
 COPY docker-entrypoint.sh /
