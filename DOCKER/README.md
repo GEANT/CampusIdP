@@ -37,7 +37,7 @@ Although the current `docker-compose.yml` deploys MySQL (`mysql:5`), it has been
 
 Prior to running an IdP, two configuration files must be prepared as already mentioned.
 
-FIXME: `JETTY_VERSION` and `SHIBBOLETH_VERSION`.
+Version for both _Jetty_ and _Shibboleth IdP_ is hardcoded in `Dockerfile`. Upgrading any of these should be done very carefully and using newer version in production should be extensively tested beforehand. That is the reason for hardcoding it. It might change in the future, though.
 
 ### idp.conf
 
