@@ -12,8 +12,8 @@ RUN apt-get -qq update && \
         dirmngr && \
     rm -rf /var/lib/apt/lists/*
 
-ARG JETTY_VERSION
-ARG SHIBBOLETH_VERSION
+ARG JETTY_VERSION=9.3.24.v20180605
+ARG SHIBBOLETH_VERSION=3.3.3
 ENV JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64/jre \
     JETTY_VERSION=$JETTY_VERSION \
     SHIBBOLETH_VERSION=$SHIBBOLETH_VERSION
