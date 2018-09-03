@@ -2,11 +2,14 @@ version: '3.6'
 services:
   idp:
     env_file: conf/${SHIBBOLETH_HOSTNAME}/idp.conf
+    env_file: conf/${SHIBBOLETH_HOSTNAME}/mysql.conf
     build:
       context: .
       args:
-        JETTY_VERSION:
-        SHIBBOLETH_VERSION:
+        JETTY_CERT_KEY:
+        SHIBBOLETH_SCOPE:
+        SHIBBOLETH_ENTITYID:
+        SHIBBOLETH_HOSTNAME:
         MYSQL_USER:
         MYSQL_PASSWORD:
     image: shibboleth-idp
@@ -27,7 +30,7 @@ services:
     depends_on:
       - db
   db:
-    env_file: conf/${SHIBBOLETH_HOSTNAME}/idp.conf
+    env_file: conf/${SHIBBOLETH_HOSTNAME}/mysql.conf
     image: mysql:5
     hostname: mysql
     volumes:
