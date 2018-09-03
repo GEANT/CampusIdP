@@ -14,8 +14,8 @@ Using `debian:stretch` official Debian Docker image produces resulting image 340
 | `debian:stretch-slim` (base image) |  55MB |
 | `debian:stretch` (Campus IdP)      | 340MB |
 | `debian:stretch-slim` (Campus IdP) | 287MB |
-| `mysql:5`                          | 372MB |
-| `mariadb:10.1`                     | 407MB |
+| `mysql:5` (base image)             | 372MB |
+| `mariadb:10.1` (base image)        | 407MB |
 
 Althoug, `db` container for storing values of `persistent-id` (aka `eduPersonTargetedID` attribute) consumes _372MB_, so saving 53MB could make a difference for someone.
 
