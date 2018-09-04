@@ -39,6 +39,41 @@ Prior to running an IdP, two configuration files must be prepared as already men
 
 Version for both _Jetty_ and _Shibboleth IdP_ is hardcoded in `Dockerfile`. Upgrading any of these should be done very carefully and using newer version in production should be extensively tested beforehand. That is the reason for hardcoding it. It might change in the future, though.
 
+All IdP configuration has to be stored in `conf/idp.example.org/` directory. Example:
+
+```
+idp.example.org/
+├── db.conf
+├── idp.conf
+├── jetty
+│   ├── cert.pem
+│   └── key.pem
+└── shibboleth-idp
+    ├── conf
+    │   ├── attribute-filter.xml
+    │   ├── attribute-resolver.xml
+    │   └── metadata-providers.xml
+    ├── credentials
+    │   ├── idp-encryption.crt
+    │   ├── idp-encryption.key
+    │   ├── idp-signing.crt
+    │   ├── idp-signing.key
+    │   ├── ldap-server.crt
+    │   └── metadata.crt.pem
+    ├── edit-webapp
+    │   ├── css
+    │   │   └── style.css
+    │   ├── images
+    │   │   └── example-logo.svg
+    │   ├── index.jsp
+    └── views
+        ├── error.vm
+        ├── intercept
+        │   └── attribute-release.vm
+        ├── login-error.vm
+        └── login.vm
+```
+
 ### idp.conf
 
 In this file, which is loaded automatically by `docker-compose.yml`, all "internal" configuration for the IdP itself is defined. These variables are not necessary for building the image, these are required only when `docker-entrypoint.sh` is run to configure built image, i.e. installed IdP. There are mostly various passwords, however, _scope_ and _entityID_ definitions for the IdP etc. should be paid attention to as well. All variables should be easily understood.
@@ -85,6 +120,8 @@ ORGANIZATION_URL_CS=https://www.example.org/cs
 CONTACTPERSON_GIVENNAME=John
 CONTACTPERSON_SURNAME=Doe
 CONTACTPERSON_EMAIL=john.doe@example.org
+
+IDP_LOGO=/images/example-logo.svg
 ```
 
 ### db.conf
@@ -93,8 +130,6 @@ This file contains all database stuff, such as root password, database name, etc
 
 ```
 MYSQL_ROOT_PASSWORD=shie9aez5Ahzakah9aen
-MYSQL_DATABASE=shibboleth
-MYSQL_USER=shibboleth
 MYSQL_PASSWORD=miehaiph3chohghoaXah
 ```
 
