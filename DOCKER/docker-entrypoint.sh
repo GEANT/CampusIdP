@@ -441,6 +441,32 @@ if [[ ! -f ${IDP_CONF_FILE} ]]; then
     echo "Done."
     echo ""
 
+    echo "Customize Shibboleth IdP..."
+    echo ""
+    echo "Copy edit-webapp/..."
+    if [[ -d /tmp/shibboleth-idp/edit-webapp/ ]]; then
+        cp -r /tmp/shibboleth-idp/edit-webapp/* /opt/shibboleth-idp/edit-webapp/
+    fi
+    echo "Done."
+    echo ""
+    echo "Copy views/..."
+    if [[ -d /tmp/shibboleth-idp/views/ ]]; then
+        cd /tmp/shibboleth-idp/
+        for d in `find views/ -type d`; do
+            for f in `find $d -type f`; do
+                cp $f /opt/shibboleth-idp/$f
+            done
+        done
+    fi
+    echo "Done."
+    echo ""
+
+    echo "Rebuilding customized idp.war..."
+    cd /opt/shibboleth-idp
+    /tmp/shibboleth-rebuild.expect
+    echo "Done."
+    echo ""
+
     echo `date +%Y-%m-%d\ %H:%M:%S` >> ${IDP_CONF_FILE}
 
 fi

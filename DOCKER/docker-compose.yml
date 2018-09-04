@@ -17,6 +17,8 @@ services:
       - jetty-logs:/opt/jetty/logs
       - ./conf/${HOST}/shibboleth-idp/conf:/tmp/shibboleth-idp/conf
       - ./conf/${HOST}/shibboleth-idp/credentials:/tmp/shibboleth-idp/credentials
+      - ./conf/${HOST}/shibboleth-idp/edit-webapp:/tmp/shibboleth-idp/edit-webapp
+      - ./conf/${HOST}/shibboleth-idp/views:/tmp/shibboleth-idp/views
       - ./conf/${HOST}/jetty:/tmp/jetty
     ports:
       - 9080:8080
