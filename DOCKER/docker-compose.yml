@@ -28,8 +28,8 @@ services:
     image: mysql:5
     hostname: mysql
     volumes:
-      - ./mysql/db:/docker-entrypoint-initdb.d
-      - ./mysql/conf:/etc/mysql/conf.d
+      - ./db/sql:/docker-entrypoint-initdb.d
+      - ./db/conf:/etc/mysql/conf.d
       - db-data:/var/lib/mysql
     environment:
       MYSQL_DATABASE: shibboleth
