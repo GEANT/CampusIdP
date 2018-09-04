@@ -371,6 +371,34 @@ echo "${FOOTER}" >> ${OUTPUT}
 
 }
 
+function shibboleth_cust_editwebapp() {
+    if [[ -d /tmp/shibboleth-idp/edit-webapp/ ]]; then
+        cp -r /tmp/shibboleth-idp/edit-webapp/* /opt/shibboleth-idp/edit-webapp/
+    fi
+}
+
+function shibboleth_cust_views() {
+    if [[ -d /tmp/shibboleth-idp/views/ ]]; then
+        cd /tmp/shibboleth-idp/
+        for d in `find views/ -type d`; do
+            for f in `find $d -type f`; do
+                cp $f /opt/shibboleth-idp/$f
+            done
+        done
+    fi
+}
+
+function shibboleth_cust_messages() {
+    MESSAGES=/opt/shibboleth-idp/messages/messages.properties
+    echo "idp.logo = ${IDP_LOGO}" >> ${MESSAGES}
+    echo "idp.logo.alt-text = logo: ${UIINFO_DISPLAYNAME_EN}" >> ${MESSAGES}
+}
+
+function shibboleth_rebuild_war() {
+    cd /opt/shibboleth-idp
+    /tmp/shibboleth-rebuild.expect
+}
+
 ########################################################################
 
 ########################################################################
@@ -443,27 +471,24 @@ if [[ ! -f ${IDP_CONF_FILE} ]]; then
 
     echo "Customize Shibboleth IdP..."
     echo ""
+
     echo "Copy edit-webapp/..."
-    if [[ -d /tmp/shibboleth-idp/edit-webapp/ ]]; then
-        cp -r /tmp/shibboleth-idp/edit-webapp/* /opt/shibboleth-idp/edit-webapp/
-    fi
+    shibboleth_cust_editwebapp
     echo "Done."
     echo ""
+
     echo "Copy views/..."
-    if [[ -d /tmp/shibboleth-idp/views/ ]]; then
-        cd /tmp/shibboleth-idp/
-        for d in `find views/ -type d`; do
-            for f in `find $d -type f`; do
-                cp $f /opt/shibboleth-idp/$f
-            done
-        done
-    fi
+    shibboleth_cust_views
+    echo "Done."
+    echo ""
+
+    echo "Customizing messages/..."
+    shibboleth_cust_messages
     echo "Done."
     echo ""
 
     echo "Rebuilding customized idp.war..."
-    cd /opt/shibboleth-idp
-    /tmp/shibboleth-rebuild.expect
+    shibboleth_rebuild_war
     echo "Done."
     echo ""
 
