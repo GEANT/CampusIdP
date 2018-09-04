@@ -31,6 +31,9 @@ services:
       - ./mysql/db:/docker-entrypoint-initdb.d
       - ./mysql/conf:/etc/mysql/conf.d
       - db-data:/var/lib/mysql
+    environment:
+      MYSQL_DATABASE: shibboleth
+      MYSQL_USER: shibboleth
 
 volumes:
   idp-conf:

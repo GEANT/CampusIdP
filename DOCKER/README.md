@@ -93,8 +93,6 @@ This file contains all database stuff, such as root password, database name, etc
 
 ```
 MYSQL_ROOT_PASSWORD=shie9aez5Ahzakah9aen
-MYSQL_DATABASE=shibboleth
-MYSQL_USER=shibboleth
 MYSQL_PASSWORD=miehaiph3chohghoaXah
 ```
 

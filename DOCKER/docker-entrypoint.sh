@@ -115,7 +115,7 @@ CONFIGURATION=`cat <<EOF
     class="org.apache.commons.dbcp2.BasicDataSource"
     p:driverClassName="com.mysql.jdbc.Driver"
     p:url="jdbc:mysql://db:3306/shibboleth"
-    p:username="${MYSQL_USER}"
+    p:username="shibboleth"
     p:password="${MYSQL_PASSWORD}" />
 
 <bean id="shibboleth.JPAStorageService"
