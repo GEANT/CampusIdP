@@ -395,8 +395,7 @@ function shibboleth_cust_messages() {
 }
 
 function shibboleth_rebuild_war() {
-    cd /opt/shibboleth-idp
-    /tmp/shibboleth-rebuild.expect
+    /opt/shibboleth-idp/bin/build.sh -Didp.target.dir=/opt/shibboleth-idp
 }
 
 ########################################################################
@@ -472,6 +471,8 @@ if [[ ! -f ${IDP_CONF_FILE} ]]; then
     echo "Customize Shibboleth IdP..."
     echo ""
 
+    set +e
+
     echo "Copy edit-webapp/..."
     shibboleth_cust_editwebapp
     echo "Done."
@@ -481,6 +482,8 @@ if [[ ! -f ${IDP_CONF_FILE} ]]; then
     shibboleth_cust_views
     echo "Done."
     echo ""
+
+    set -e
 
     echo "Customizing messages/..."
     shibboleth_cust_messages

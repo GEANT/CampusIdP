@@ -5,7 +5,6 @@ MAINTAINER Jan Oppolzer <jan@oppolzer.cz>
 RUN apt-get -qq update && \
     apt-get -qq -y --no-install-recommends install \
         wget \
-        expect \
         ed \
         openjdk-8-jre-headless \
         gnupg2 \
@@ -63,7 +62,6 @@ RUN wget -q -P /opt/src/ https://shibboleth.net/downloads/identity-provider/$SHI
     tar -xzf /opt/src/shibboleth-identity-provider-$SHIBBOLETH_VERSION.tar.gz -C /opt && \
     rm -rf /opt/src/
 
-COPY conf/common/scripts/ /tmp/
 COPY docker-entrypoint.sh /
 
 EXPOSE 8080 8443

@@ -6,18 +6,18 @@ The primary way to run this is to use `docker-compose` command, but prior to tah
 
 ## debian:stretch-slim
 
-Using `debian:stretch` official Debian Docker image produces resulting image 340MB in size. There is also `debian:stretch-slim`, which is 46 MB smaller compared to `debian:stretch`. In case such saving is desirable, changing the first line of `Dockerfile` and also putting `mkdir -p /usr/share/man/man1` right before `apt-get install` command due to a [reported bug][] is enough.
+Using `debian:stretch` official Debian Docker image produces resulting image 335MB in size. There is also `debian:stretch-slim`, which is 46 MB smaller compared to `debian:stretch`. In case such saving is desirable, changing the first line of `Dockerfile` and also putting `mkdir -p /usr/share/man/man1` right before `apt-get install` command due to a [reported bug][] is enough.
 
 | Docker image                       | Size  |
 | ---------------------------------- | -----:|
 | `debian:stretch` (base image)      | 101MB |
 | `debian:stretch-slim` (base image) |  55MB |
-| `debian:stretch` (Campus IdP)      | 340MB |
-| `debian:stretch-slim` (Campus IdP) | 287MB |
+| `debian:stretch` (Campus IdP)      | 335MB |
+| `debian:stretch-slim` (Campus IdP) | 281MB |
 | `mysql:5` (base image)             | 372MB |
 | `mariadb:10.1` (base image)        | 407MB |
 
-Althoug, `db` container for storing values of `persistent-id` (aka `eduPersonTargetedID` attribute) consumes _372MB_, so saving 53MB could make a difference for someone.
+Althoug, `db` container for storing values of `persistent-id` (aka `eduPersonTargetedID` attribute) consumes _372MB_, so saving 54MB could make a difference for someone.
 
 It could be saved additional 48MB by deleting `/opt/shibboleth-identity-provider-$SHIBBOLETH_VERSION/` directory which is not neccessary after it has been installed using `install.sh` script. However, that assumes the installation is run from the `Dockerfile` not `docker-entrypoint.sh`. And I am sure it is not worth it.
 

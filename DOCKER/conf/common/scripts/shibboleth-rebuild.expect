@@ -1,9 +1,0 @@
-#!/usr/bin/expect
-
-spawn ./bin/build.sh
-
-expect "Installation Directory"
-send "/opt/shibboleth-idp\r"
-
-expect "BUILD SUCCESSFUL"
-expect eof
