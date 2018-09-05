@@ -395,8 +395,7 @@ function shibboleth_cust_messages() {
 }
 
 function shibboleth_rebuild_war() {
-    cd /opt/shibboleth-idp
-    /tmp/shibboleth-rebuild.expect
+    /opt/shibboleth-idp/bin/build.sh -Didp.target.dir=/opt/shibboleth-idp
 }
 
 ########################################################################
